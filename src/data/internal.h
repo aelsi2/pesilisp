@@ -2,6 +2,10 @@
 
 #include "object.h"
 
+// A special LISP object ref_count value that disables
+// reference counting.
+#define REFCOUNT_OFF (-1)
+
 typedef struct {
     obj_type_t type;
     result_t (*eval)(object_t *object);

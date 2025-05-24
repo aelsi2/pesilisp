@@ -54,7 +54,7 @@ object_t *obj_make_int(intval_t value) {
 }
 
 intval_t obj_get_int(object_t *object) {
-    if (!is_integer(object)) {
+    if (!obj_is_int(object)) {
         return 0;
     }
     return ((integer_t*)object)->value;

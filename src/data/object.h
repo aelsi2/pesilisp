@@ -4,10 +4,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-// A special LISP object ref_count value that disables
-// reference counting.
-#define REFCOUNT_OFF (-1)
-
 // Represents a LISP type identifier.
 typedef enum {
     TYPE_NIL = 0,

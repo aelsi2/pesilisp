@@ -13,7 +13,7 @@ extern object_t *const T;
 extern object_t *const NIL;
 
 // Checks if the object is a LISP integer.
-inline static bool is_integer(object_t *object) {
+inline static bool obj_is_int(object_t *object) {
     return obj_type(object) == TYPE_INT;
 }
 
@@ -30,7 +30,7 @@ inline static object_t *obj_make_bool(bool value) {
 }
 
 // Creates the LISP representation of the boolean value.
-inline static bool obj_get_bool(object_t *object) {
+inline static bool obj_get_bool(const object_t *object) {
     return obj_type(object) != TYPE_NIL;
 }
 
