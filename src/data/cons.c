@@ -46,6 +46,7 @@ static void cons_free(object_t *obj) {
 }
 
 const obj_type_t TYPE_CONS = (obj_type_t){
+    .name = "CONS",
     .base = &TYPE_T,
     .size = sizeof(cons_t),
     .eval = cons_eval,

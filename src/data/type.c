@@ -27,6 +27,10 @@ result_t obj_eval_self(object_t *object, env_t *env) {
     return result_success(obj_ref(object));
 }
 
+void obj_print_default(const object_t *object, FILE *file) {
+    fprintf(file, "<%s:%p>", object->type->name, object);
+}
+
 hash_t obj_hash_default(const object_t *object) {
     return hash_int64((int64_t)object);
 }

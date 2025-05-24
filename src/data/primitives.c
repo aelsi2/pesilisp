@@ -24,6 +24,7 @@ static hash_t integer_hash(const object_t *object) {
 }
 
 const obj_type_t TYPE_T = (obj_type_t) {
+    .name = "T",
     .base = NULL,
     .size = sizeof(object_t),
     .eval = obj_eval_self,
@@ -38,6 +39,7 @@ object_t *const T = &(object_t){
 };
 
 const obj_type_t TYPE_NULL = (obj_type_t) {
+    .name = "NULL",
     .base = NULL,
     .size = sizeof(object_t),
     .eval = obj_eval_self,
@@ -52,6 +54,7 @@ object_t *const NIL = &(object_t){
 };
 
 const obj_type_t TYPE_INT = (obj_type_t){
+    .name = "INTEGER",
     .base = &TYPE_T,
     .size = sizeof(integer_t),
     .eval = obj_eval_self,

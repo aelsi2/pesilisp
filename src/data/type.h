@@ -8,6 +8,7 @@
 #define REFCOUNT_OFF (-1)
 
 struct obj_type_s {
+    char *name;
     const obj_type_t *base;
     size_t size;
     result_t (*eval)(object_t *object, env_t *env);
@@ -28,6 +29,8 @@ void *obj_alloc_default(const obj_type_t *const type);
 void obj_free_default(object_t *object);
 
 result_t obj_eval_self(object_t *object, env_t *env);
+
+void obj_print_default(const object_t *object, FILE *file);
 
 hash_t obj_hash_default(const object_t *object);
 
