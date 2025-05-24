@@ -19,6 +19,7 @@ struct env_s {
     size_t capacity;
     size_t count;
     env_t *parent;
+    int ref_count;
 };
 
 env_t *env_new(env_t *parent) {
@@ -26,20 +27,9 @@ env_t *env_new(env_t *parent) {
     env->count = 0;
     env->capacity = INITIAL_CAPACITY;
     env->cells = calloc(env->capacity, sizeof(kvp_t));
-    env->parent = parent;
+    env->parent = env_ref(parent);
+    env->ref_count = 1;
     return env;
-}
-
-void env_free(env_t *env) {
-    for (int i = 0; i < env->capacity; i++) {
-        if (!env->cells[i].key) {
-            continue;
-        }
-        free(env->cells[i].key);
-        obj_unref(env->cells[i].value);
-    }
-    free(env->cells);
-    free(env);
 }
 
 static size_t env_get_index(const env_t *env, const char *name) {
@@ -131,21 +121,33 @@ object_t *env_get(const env_t *env, const char *name) {
     }
 }
 
-static void env_set_all(const env_t *src, env_t *dest) {
-    if (src->parent) {
-        env_set_all(src->parent, dest);
-    }
-    for (int i = 0; i < src->capacity; i++) {
-        kvp_t *kvp = &src->cells[i];
-        if (!kvp->key) {
+static void env_free(env_t *env) {
+    for (int i = 0; i < env->capacity; i++) {
+        if (!env->cells[i].key) {
             continue;
         }
-        env_set(dest, kvp->key, kvp->value);
+        free(env->cells[i].key);
+        obj_unref(env->cells[i].value);
     }
+    free(env->cells);
+    env_unref(env->parent);
+    free(env);
 }
 
-env_t *env_capture(const env_t *env) {
-    env_t *result = env_new(NULL);
-    env_set_all(env, result);
-    return result;
+env_t *env_ref(env_t *env) {
+    if (env == NULL) {
+        return NULL;
+    }
+    env->ref_count++;
+    return env;
+}
+
+env_t *env_unref(env_t *env) {
+    if (env == NULL) {
+        return NULL;
+    }
+    if (!--env->ref_count) {
+        env_free(env);
+    }
+    return NULL;
 }

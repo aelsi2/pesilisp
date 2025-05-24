@@ -20,6 +20,6 @@ int main() {
     fputc('\n', stdout);
     fprintf(stdout, "%llx\n", obj_hash(cons_ref));
     obj_unref(cons_ref);
-    env_free(env);
+    env_unref(env);
     return 0;
 }
