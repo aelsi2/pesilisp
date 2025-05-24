@@ -6,16 +6,7 @@
 #include "hash.h"
 
 typedef struct env_s env_t;
-
-// Represents a LISP type identifier.
-typedef enum {
-    TYPE_NIL = 0,
-    TYPE_T = 1,
-    TYPE_INT = 2,
-    TYPE_CONS = 3,
-    TYPE_SYM = 4,
-    TYPE_FUNC = 5
-} obj_type_t;
+typedef struct obj_type_s obj_type_t;
 
 // Represents a LISP object.
 typedef struct object_s object_t;
@@ -42,8 +33,11 @@ inline static result_t result_error(error_t *error) {
     };
 }
 
-// Gets the type id of the LISP object.
-obj_type_t obj_type(const object_t *object);
+// Gets the most specific type of the LISP object.
+const obj_type_t *obj_get_type(const object_t *object);
+
+// Checks if the object is of the specified type.
+bool obj_of_type(const object_t *object, const obj_type_t *type);
 
 // Evaluates the LISP object and returns a new object or an error.
 result_t obj_eval(object_t *object, env_t *env);

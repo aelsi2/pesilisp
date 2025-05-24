@@ -2,9 +2,11 @@
 
 #include "data/object.h"
 
+extern const obj_type_t TYPE_SYM;
+
 // Checks if the object is a LISP symbol.
 inline static bool obj_is_sym(object_t *object) {
-    return obj_type(object) == TYPE_SYM;
+    return obj_get_type(object) == &TYPE_SYM;
 }
 
 // Creates a new LISP symbol.

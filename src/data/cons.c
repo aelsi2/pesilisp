@@ -1,5 +1,5 @@
 #include "data/cons.h"
-#include "data/internal.h"
+#include "data/type.h"
 #include "data/primitives.h"
 
 typedef struct {
@@ -26,7 +26,7 @@ static void cons_print(const object_t *obj, FILE *file) {
         obj_print(cons->car, file);
         obj = cons->cdr;
     }
-    if (obj_get_bool(obj)) {
+    if (!obj_is_null(obj)) {
         fprintf(file, " . ");
         obj_print(obj, file);
     }
@@ -45,8 +45,9 @@ static void cons_free(object_t *obj) {
     obj_free_default(obj);
 }
 
-static obj_vtable_t *cons_vtable = &(obj_vtable_t){
-    .type = TYPE_CONS,
+const obj_type_t TYPE_CONS = (obj_type_t){
+    .base = &TYPE_T,
+    .size = sizeof(cons_t),
     .eval = cons_eval,
     .print = cons_print,
     .hash = cons_hash,
@@ -54,7 +55,7 @@ static obj_vtable_t *cons_vtable = &(obj_vtable_t){
 };
 
 object_t *obj_cons(object_t *car, object_t *cdr) {
-    cons_t *cons = obj_alloc_default(cons_vtable, sizeof(cons_t));
+    cons_t *cons = obj_alloc_default(&TYPE_CONS);
     cons->car = obj_ref(car);
     cons->cdr = obj_ref(cdr);
     return &cons->base;

@@ -1,6 +1,7 @@
 #include "symbol.h"
+#include "data/primitives.h"
 #include "environment.h"
-#include "internal.h"
+#include "type.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,8 +31,9 @@ static void symbol_free(object_t *obj) {
     obj_free_default(obj);
 }
 
-static obj_vtable_t *symbol_vtable = &(obj_vtable_t){
-    .type = TYPE_SYM,
+const obj_type_t TYPE_SYM = (obj_type_t){
+    .base = &TYPE_T,
+    .size = sizeof(symbol_t),
     .eval = symbol_eval,
     .print = symbol_print,
     .hash = symbol_hash,
@@ -39,7 +41,7 @@ static obj_vtable_t *symbol_vtable = &(obj_vtable_t){
 };
 
 object_t *obj_make_sym(const char *name) {
-    symbol_t *symbol = obj_alloc_default(symbol_vtable, sizeof(symbol_t));
+    symbol_t *symbol = obj_alloc_default(&TYPE_SYM);
     symbol->name = malloc(strlen(name) + 1);
     strcpy(symbol->name, name);
     return &symbol->base;

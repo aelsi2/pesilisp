@@ -8,7 +8,7 @@ DEPS := $(OBJS:%.o=%.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CFLAGS := $(INC_FLAGS) -MMD -MP -O2 -g
-LDFLAGS := -fsanitize=leak
+LDFLAGS := -fsanitize=leak -fsanitize=address
 
 .PHONY: all
 build: $(TARGET_EXEC)
