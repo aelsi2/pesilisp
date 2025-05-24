@@ -15,3 +15,5 @@ object_t *obj_car(object_t *obj);
 
 object_t *obj_cdr(object_t *obj);
 
+int obj_list_length(object_t *obj);
+
