@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+typedef struct env_s env_t;
+
 // Represents a LISP type identifier.
 typedef enum {
     TYPE_NIL = 0,
@@ -43,7 +45,7 @@ inline static result_t result_error(error_t *error) {
 obj_type_t obj_type(const object_t *object);
 
 // Evaluates the LISP object and returns a new object or an error.
-result_t obj_eval(object_t *object);
+result_t obj_eval(object_t *object, env_t *env);
 
 // Prints the LISP object to the file.
 void obj_print(const object_t *object, FILE *file);
@@ -57,4 +59,3 @@ object_t *obj_ref(object_t *object);
 // decrements its reference count.
 // Returns the LISP NIL value.
 object_t *obj_unref(object_t *object);
-

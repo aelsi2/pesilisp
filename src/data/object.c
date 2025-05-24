@@ -6,8 +6,8 @@ obj_type_t obj_type(const object_t *object) {
     return object->vtable->type;
 }
 
-result_t obj_eval(object_t *object) {
-    return object->vtable->eval(object);
+result_t obj_eval(object_t *object, env_t *env) {
+    return object->vtable->eval(object, env);
 }
 
 void obj_print(const object_t *object, FILE *file) {

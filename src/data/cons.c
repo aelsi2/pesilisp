@@ -8,9 +8,9 @@ typedef struct {
     object_t *cdr;
 } cons_t;
 
-static result_t cons_eval(object_t *obj) {
+static result_t cons_eval(object_t *obj, env_t *env) {
     cons_t *cons = (cons_t*)obj;
-    return obj_eval_self(obj);
+    return obj_eval_self(obj, env);
 }
 
 static void cons_print(const object_t *obj, FILE *file) {

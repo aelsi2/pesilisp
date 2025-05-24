@@ -2,16 +2,22 @@
 #include "data/object.h"
 #include "data/primitives.h"
 #include "data/cons.h"
+#include "data/environment.h"
 
 int main() {
     object_t *integer = obj_make_int(10);
     object_t *cons1 = obj_cons(integer, NIL);
     object_t *cons2 = obj_cons(cons1, NIL);
     object_t *cons3 = obj_cons(NIL, cons2);
-    obj_print(cons3, stdout);
+    env_t *env = env_new(NULL);
+    env_set(env, "cons3", cons3);
     obj_unref(cons3);
     obj_unref(cons2);
     obj_unref(cons1);
     obj_unref(integer);
+    object_t *cons_ref = env_get(env, "cons3");
+    obj_print(cons_ref, stdout);
+    obj_unref(cons_ref);
+    env_free(env);
     return 0;
 }
