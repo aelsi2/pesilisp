@@ -40,7 +40,7 @@ object_t *const T = &(object_t){
 
 const obj_type_t TYPE_NULL = (obj_type_t) {
     .name = "NULL",
-    .base = NULL,
+    .base = &TYPE_T,
     .size = sizeof(object_t),
     .eval = obj_eval_self,
     .print = nil_print,
