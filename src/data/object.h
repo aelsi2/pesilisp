@@ -3,6 +3,7 @@
 #include "error.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include "hash.h"
 
 typedef struct env_s env_t;
 
@@ -49,6 +50,9 @@ result_t obj_eval(object_t *object, env_t *env);
 
 // Prints the LISP object to the file.
 void obj_print(const object_t *object, FILE *file);
+
+// Hashes the LISP object.
+hash_t obj_hash(const object_t *object);
 
 // Creates a new reference to the LISP object and
 // increments its reference count.

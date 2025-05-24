@@ -33,6 +33,11 @@ static void cons_print(const object_t *obj, FILE *file) {
     fputc(')', file);
 }
 
+static hash_t cons_hash(const object_t *obj) {
+    cons_t *cons = (cons_t*)obj;
+    return hash_combine(obj_hash(cons->car), obj_hash(cons->cdr));
+}
+
 static void cons_free(object_t *obj) {
     cons_t *cons = (cons_t*)obj;
     obj_unref(cons->car);
@@ -44,6 +49,7 @@ static obj_vtable_t *cons_vtable = &(obj_vtable_t){
     .type = TYPE_CONS,
     .eval = cons_eval,
     .print = cons_print,
+    .hash = cons_hash,
     .free = cons_free,
 };
 

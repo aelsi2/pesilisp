@@ -17,6 +17,8 @@ int main() {
     obj_unref(integer);
     object_t *cons_ref = env_get(env, "cons3");
     obj_print(cons_ref, stdout);
+    fputc('\n', stdout);
+    fprintf(stdout, "%llx\n", obj_hash(cons_ref));
     obj_unref(cons_ref);
     env_free(env);
     return 0;

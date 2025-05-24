@@ -14,6 +14,10 @@ void obj_print(const object_t *object, FILE *file) {
     object->vtable->print(object, file);
 }
 
+hash_t obj_hash(const object_t *object) {
+    return object->vtable->hash(object);
+}
+
 object_t *obj_ref(object_t *object) {
     if (object->ref_count != REFCOUNT_OFF) {
         object->ref_count++;
