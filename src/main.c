@@ -1,31 +1,33 @@
 #include "data/cons.h"
 #include "data/environment.h"
 #include "data/func.h"
+#include "data/list.h"
 #include "data/object.h"
 #include "data/primitives.h"
 #include "data/symbol.h"
 #include <stdio.h>
 
-result_t lisp_add(object_t *func, env_t *env, object_t *args) { 
+result_t lisp_add(object_t *func, env_t *env, object_t *args) {
     intval_t result = 0;
 
-    object_t *arg_list = obj_ref(args);
-    object_t *arg = NIL;
-    while (obj_list_next(&arg_list, &arg)) {
-        result_t eval_res = obj_eval(arg, env);
-        if (result_is_error(&eval_res)) {
-            obj_unref(arg_list);
-            obj_unref(arg);
-            return eval_res;
-        }
-        if (!obj_is_int(arg)) {
-            obj_unref(arg_list);
-            obj_unref(arg);
+    obj_list_t list;
+    if (!obj_get_list(args, &list)) {
+        return result_error(NULL);
+    }
+    error_t *error;
+    if (!obj_list_eval_all(&list, env, &error)) {
+        obj_list_free(&list);
+        return result_error(error);
+    }
+
+    for (int i = 0; i < list.count; i++) {
+        if (!obj_is_int(list.array[i])) {
+            obj_list_free(&list);
             return result_error(NULL);
         }
-        result += obj_get_int(arg);
-        obj_unref(eval_res.object);
+        result += obj_get_int(list.array[i]);
     }
+    obj_list_free(&list);
 
     return result_success(obj_make_int(result));
 }
@@ -55,7 +57,7 @@ int main() {
     fputc('\n', stdout);
     obj_print(result, stdout);
     fputc('\n', stdout);
-    
+
     obj_unref(result);
     obj_unref(expr);
     env_free(env);

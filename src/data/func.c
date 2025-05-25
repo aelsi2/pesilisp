@@ -1,5 +1,6 @@
 #include "func.h"
-#include "data/cons.h"
+#include "data/cache.h"
+#include "data/list.h"
 #include "data/object.h"
 #include "data/primitives.h"
 #include "environment.h"
@@ -20,6 +21,7 @@ const obj_type_t TYPE_FUNC = (obj_type_t){
     .eval = obj_eval_self,
     .print = obj_print_default,
     .hash = obj_hash_default,
+    .equals = obj_equals_default,
     .free = obj_free_default,
 };
 
@@ -30,12 +32,16 @@ typedef struct {
     char **args;
     env_t *captured_env;
     object_t *value;
+    cache_t *cache;
 } lisp_func_t;
 
 static void lisp_func_free(object_t *obj) {
     lisp_func_t *func = (lisp_func_t *)obj;
     for (int i = 0; i < func->arg_count; i++) {
         free(func->args[i]);
+    }
+    if (func->cache) {
+        cache_free(func->cache);
     }
     env_free(func->captured_env);
     obj_unref(func->value);
@@ -50,6 +56,7 @@ static const obj_type_t TYPE_LISP_FUNC = (obj_type_t){
     .eval = obj_eval_self,
     .print = obj_print_default,
     .hash = obj_hash_default,
+    .equals = obj_equals_default,
     .free = lisp_func_free,
 };
 
@@ -61,30 +68,40 @@ object_t *obj_make_native_func(lisp_callback_t *callback) {
 
 static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
     lisp_func_t *func = (lisp_func_t *)object;
+
+    obj_list_t list;
+    if (!obj_get_list(args, &list)) {
+        return result_error(NULL);
+    }
+    if (list.count != func->arg_count) {
+        return result_error(NULL);
+    }
+    error_t *error;
+    if (!obj_list_eval_all(&list, env, &error)) {
+        obj_list_free(&list);
+        return result_error(error);
+    }
+
+    bool cache_enabled = func->cache != NULL && should_cache(&list);
+    object_t *cached_result = NIL;
+    if (cache_enabled && cache_try_get(func->cache, &list, &cached_result)) {
+        obj_list_free(&list);
+        return result_success(cached_result);
+    }
+
     env_t *exec_env = env_new(func->captured_env);
-   
-    object_t *arg_list = obj_ref(args);
-    object_t *arg = NIL;
-    int arg_count = 0;
-    while (obj_list_next(&arg_list, &arg)) {
-        result_t eval_res = obj_eval(arg, env);
-        if (result_is_error(&eval_res)) {
-            obj_unref(arg_list);
-            obj_unref(arg);
-            env_free(exec_env);
-            return eval_res;
-        }
-        env_define(exec_env, func->args[arg_count], eval_res.object);
-        obj_unref(eval_res.object);
+    for (int i = 0; i < list.count; i++) {
+        env_define(exec_env, func->args[i], list.array[i]);
     }
     if (func->name != NULL) {
         env_define(exec_env, func->name, object);
     }
-    if (arg_count != func->arg_count) {
-        env_free(exec_env);
-        return result_error(NULL);
-    }
+
     result_t result = obj_eval(func->value, exec_env);
+    if (cache_enabled && !result_is_error(&result)) {
+        cache_remember(func->cache, &list, result.object);
+    }
+    obj_list_free(&list);
     env_free(exec_env);
     return result;
 }
@@ -102,6 +119,7 @@ object_t *obj_make_lisp_func(char *name, int arg_count, const char **args,
     func->captured_env = env_capture(environment);
     func->value = obj_ref(value);
     func->base.callback = lisp_func_call;
+    func->cache = cache_new();
 
     func->arg_count = arg_count;
     func->args = malloc(sizeof(char *) * func->arg_count);

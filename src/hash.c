@@ -1,8 +1,10 @@
 #include "hash.h"
 #include <string.h>
 
+const hash_t hash_default = 14695981039346656037u;
+
 hash_t hash(const void *bytes, size_t length) {
-    hash_t hash = 14695981039346656037u;
+    hash_t hash = hash_default;
     for (size_t i = 0; i < length; i++) {
         hash ^= ((char*)bytes)[i];
         hash *= 1099511628211u;

@@ -22,6 +22,10 @@ hash_t obj_hash(const object_t *object) {
     return object->type->hash(object);
 }
 
+bool obj_equals(const object_t *object, const object_t *other) {
+    return object->type->equals(object, other);
+}
+
 object_t *obj_ref(object_t *object) {
     if (object->ref_count != REFCOUNT_OFF) {
         object->ref_count++;

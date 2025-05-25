@@ -25,6 +25,13 @@ static hash_t symbol_hash(const object_t *obj) {
     return hash_str(sym->name);
 }
 
+static bool symbol_equal(const object_t *obj, const object_t *other) {
+    if (!obj_is_sym(other)) {
+        return false;
+    }
+    return !strcmp(obj_get_sym(obj), obj_get_sym(other));
+}
+
 static void symbol_free(object_t *obj) {
     symbol_t *sym = (symbol_t *)obj;
     free(sym->name);
@@ -49,7 +56,7 @@ object_t *obj_make_sym(const char *name) {
     return &symbol->base;
 }
 
-const char *obj_get_sym(object_t *obj) {
+const char *obj_get_sym(const object_t *obj) {
     if (!obj_is_sym(obj)) {
         return NULL;
     }

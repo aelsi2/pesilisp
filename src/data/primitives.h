@@ -17,7 +17,7 @@ extern object_t *const T;
 extern object_t *const NIL;
 
 // Checks if the object is a LISP integer.
-inline static bool obj_is_int(object_t *object) {
+inline static bool obj_is_int(const object_t *object) {
     return obj_get_type(object) == &TYPE_INT;
 }
 
@@ -26,7 +26,7 @@ object_t *obj_make_int(intval_t value);
 
 // Gets the value of the LISP integer.
 // Returns 0 if the value is not an integer.
-intval_t obj_get_int(object_t *object);
+intval_t obj_get_int(const object_t *object);
 
 // Checks if the object is a NIL value.
 inline static bool obj_is_null(const object_t *object) {

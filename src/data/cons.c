@@ -1,5 +1,6 @@
 #include "data/cons.h"
 #include "data/func.h"
+#include "data/object.h"
 #include "data/primitives.h"
 #include "data/type.h"
 
@@ -49,6 +50,22 @@ static hash_t cons_hash(const object_t *obj) {
     return hash_combine(obj_hash(cons->car), obj_hash(cons->cdr));
 }
 
+static bool cons_equals(const object_t *obj, const object_t *other) {
+    if (!obj_is_cons(other)) {
+        return false;
+    }
+    cons_t *cons_a = (cons_t *)obj;
+    cons_t *cons_b = (cons_t *)other;
+
+    if (!obj_equals(cons_a->car, cons_b->car)) {
+        return false;
+    }
+    if (!obj_equals(cons_a->cdr, cons_b->cdr)) {
+        return false;
+    }
+    return true;
+}
+
 static void cons_free(object_t *obj) {
     cons_t *cons = (cons_t *)obj;
     obj_unref(cons->car);
@@ -90,30 +107,3 @@ object_t *obj_cdr(object_t *obj) {
     return obj_ref(cons->cdr);
 }
 
-bool obj_list_next(object_t **list, object_t **element) {
-    if (obj_is_cons(*list)) {
-        object_t *car = obj_car(*list);
-        object_t *cdr = obj_cdr(*list);
-        obj_unref(*list);
-        obj_unref(*element);
-        *element = car;
-        *list = cdr;
-        return true;
-    } else {
-        obj_unref(*list);
-        obj_unref(*element);
-        *list = NIL;
-        *element = NIL;
-        return false;
-    }
-}
-
-int obj_list_length(object_t *obj) {
-    int length = 0;
-    while (obj_is_cons(obj)) {
-        cons_t *cons = (cons_t *)obj;
-        obj = cons->cdr;
-        length++;
-    }
-    return length;
-}

@@ -15,6 +15,7 @@ struct obj_type_s {
     result_t (*eval)(object_t *object, env_t *env);
     void (*print)(const object_t *object, FILE *file);
     hash_t (*hash)(const object_t *object);
+    bool (*equals)(const object_t *object, const object_t *other);
     void (*free)(object_t *object);
 };
 
@@ -36,4 +37,6 @@ void obj_print_default(const object_t *object, FILE *file);
 hash_t obj_hash_default(const object_t *object);
 
 void obj_free_noop(object_t *object);
+
+bool obj_equals_default(const object_t *object, const object_t *other);
 

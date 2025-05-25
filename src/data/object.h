@@ -52,6 +52,9 @@ void obj_print(const object_t *object, FILE *file);
 // Hashes the LISP object.
 hash_t obj_hash(const object_t *object);
 
+// Checks if two LISP objects are equal.
+bool obj_equals(const object_t *object, const object_t *other);
+
 // Creates a new reference to the LISP object and
 // increments its reference count.
 // Returns the new reference.

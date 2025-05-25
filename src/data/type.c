@@ -37,3 +37,7 @@ hash_t obj_hash_default(const object_t *object) {
 
 void obj_free_noop(object_t *object) {
 }
+
+bool obj_equals_default(const object_t *object, const object_t *other) {
+    return object == other;
+}
