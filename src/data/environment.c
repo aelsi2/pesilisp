@@ -19,7 +19,6 @@ struct env_s {
     size_t capacity;
     size_t count;
     env_t *parent;
-    int ref_count;
 };
 
 env_t *env_new(env_t *parent) {
@@ -27,8 +26,7 @@ env_t *env_new(env_t *parent) {
     env->count = 0;
     env->capacity = INITIAL_CAPACITY;
     env->cells = calloc(env->capacity, sizeof(kvp_t));
-    env->parent = env_ref(parent);
-    env->ref_count = 1;
+    env->parent = parent;
     return env;
 }
 
@@ -54,7 +52,7 @@ static kvp_t *env_find_cell(const env_t *env, const char *name) {
     }
 }
 
-bool env_is_declared(const env_t *env, const char *name) {
+bool env_is_defined(const env_t *env, const char *name) {
     kvp_t *cell = env_find_cell(env, name);
     return cell->key != NULL;
 }
@@ -96,22 +94,6 @@ void env_define(env_t *env, const char *name, object_t *value) {
     cell->value = obj_ref(value);
 }
 
-static bool env_set_nodef(env_t *env, const char *name, object_t *value) {
-    kvp_t *cell = env_find_cell(env, name);
-    if (cell->key) {
-        obj_unref(cell->value);
-        cell->value = obj_ref(value);
-        return true;
-    }
-    return env->parent && env_set_nodef(env->parent, name, value);
-}
-
-void env_set(env_t *env, const char *name, object_t *value) {
-    if (!env_set_nodef(env, name, value)) {
-        env_define(env, name, value);
-    }
-}
-
 object_t *env_get(const env_t *env, const char *name) {
     kvp_t *cell = env_find_cell(env, name);
     if (cell->key) {
@@ -121,7 +103,26 @@ object_t *env_get(const env_t *env, const char *name) {
     }
 }
 
-static void env_free(env_t *env) {
+void env_add_all(env_t *dest, const env_t *src) {
+    if (src->parent != NULL) {
+        env_add_all(dest, src->parent);
+    }
+    for (int i = 0; i < src->capacity; i++) {
+        kvp_t *cell = &src->cells[i];
+        if (!cell->key) {
+            continue;
+        }
+        env_define(dest, cell->key, cell->value);
+    }
+}
+
+env_t *env_capture(const env_t *env) {
+    env_t *capture = env_new(NULL);
+    env_add_all(capture, env);
+    return capture;
+}
+
+void env_free(env_t *env) {
     for (int i = 0; i < env->capacity; i++) {
         if (!env->cells[i].key) {
             continue;
@@ -130,24 +131,6 @@ static void env_free(env_t *env) {
         obj_unref(env->cells[i].value);
     }
     free(env->cells);
-    env_unref(env->parent);
     free(env);
 }
 
-env_t *env_ref(env_t *env) {
-    if (env == NULL) {
-        return NULL;
-    }
-    env->ref_count++;
-    return env;
-}
-
-env_t *env_unref(env_t *env) {
-    if (env == NULL) {
-        return NULL;
-    }
-    if (!--env->ref_count) {
-        env_free(env);
-    }
-    return NULL;
-}

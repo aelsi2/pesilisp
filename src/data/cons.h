@@ -15,5 +15,7 @@ object_t *obj_car(object_t *obj);
 
 object_t *obj_cdr(object_t *obj);
 
+bool obj_list_next(object_t **list, object_t **element);
+
 int obj_list_length(object_t *obj);
 

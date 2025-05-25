@@ -11,6 +11,7 @@ struct obj_type_s {
     char *name;
     const obj_type_t *base;
     size_t size;
+    bool is_primitive;
     result_t (*eval)(object_t *object, env_t *env);
     void (*print)(const object_t *object, FILE *file);
     hash_t (*hash)(const object_t *object);

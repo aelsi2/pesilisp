@@ -6,18 +6,34 @@
 #include "data/symbol.h"
 #include <stdio.h>
 
-result_t lisp_add(object_t *func, int arg_count, object_t **args) { 
+result_t lisp_add(object_t *func, env_t *env, object_t *args) { 
     intval_t result = 0;
-    for (int i = 0; i < arg_count; i++) {
-        result += obj_get_int(args[i]);
+
+    object_t *arg_list = obj_ref(args);
+    object_t *arg = NIL;
+    while (obj_list_next(&arg_list, &arg)) {
+        result_t eval_res = obj_eval(arg, env);
+        if (result_is_error(&eval_res)) {
+            obj_unref(arg_list);
+            obj_unref(arg);
+            return eval_res;
+        }
+        if (!obj_is_int(arg)) {
+            obj_unref(arg_list);
+            obj_unref(arg);
+            return result_error(NULL);
+        }
+        result += obj_get_int(arg);
+        obj_unref(eval_res.object);
     }
+
     return result_success(obj_make_int(result));
 }
 
 int main() {
     object_t *add_func = obj_make_native_func(lisp_add);
     env_t *env = env_new(NULL);
-    env_set(env, "+", add_func);
+    env_define(env, "+", add_func);
     add_func = obj_unref(add_func);
 
     object_t *symbol = obj_make_sym("+");
@@ -42,7 +58,7 @@ int main() {
     
     obj_unref(result);
     obj_unref(expr);
-    env_unref(env);
+    env_free(env);
 
     return 0;
 }

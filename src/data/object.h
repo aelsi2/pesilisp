@@ -33,6 +33,10 @@ inline static result_t result_error(error_t *error) {
     };
 }
 
+inline static bool result_is_error(result_t *result) {
+    return result->object == NULL;
+}
+
 // Gets the most specific type of the LISP object.
 const obj_type_t *obj_get_type(const object_t *object);
 

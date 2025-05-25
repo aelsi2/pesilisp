@@ -16,17 +16,14 @@ bool env_is_defined(const env_t *env, const char *name);
 // Defines a variable in the environment and sets it to the specified value.
 void env_define(env_t *env, const char *name, object_t *value);
 
-// Sets the variable in the environment or one of its ancestors
-// depending on where it was defined.
-void env_set(env_t *env, const char *name, object_t *value);
-
 // Gets a variable from the environment or one of its ancestors
 // depending on where it was defined.
 // Returns NIL if the variable is undefined.
 object_t *env_get(const env_t *env, const char *name);
 
-// Creates a new reference to the environment and returns it.
-env_t *env_ref(env_t *env);
+// Captures the environment creating a copy.
+env_t *env_capture(const env_t *env);
 
-// Drops a reference to the environment and returns NULL.
-env_t *env_unref(env_t *env);
+// Frees the environment.
+void env_free(env_t *env);
+
