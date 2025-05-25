@@ -1,52 +1,27 @@
 #include "list.h"
 #include "cons.h"
-#include "primitives.h"
 #include <stdlib.h>
 
-bool obj_list_next(object_t **list, object_t **element) {
-    if (obj_is_cons(*list)) {
-        object_t *car = obj_car(*list);
-        object_t *cdr = obj_cdr(*list);
-        obj_unref(*list);
-        obj_unref(*element);
-        *element = car;
-        *list = cdr;
-        return true;
-    } else {
-        obj_unref(*list);
-        obj_unref(*element);
-        *list = NIL;
-        *element = NIL;
-        return false;
-    }
-}
+obj_list_t obj_flatten(object_t *obj) {
+    obj_list_t list;
+    size_t capacity = 16;
+    list.count = 0;
+    list.array = malloc(sizeof(object_t *) * capacity);
 
-bool obj_get_list(object_t *obj, obj_list_t *list) {
-    int length = 0;
-    object_t *len_obj = obj_ref(obj);
-    while (obj_is_cons(len_obj)) {
-        object_t *cdr = obj_cdr(len_obj);
-        obj_unref(len_obj);
-        len_obj = cdr;
-        length++;
+    obj = obj_ref(obj);
+    while (obj_is_cons(obj)) {
+        object_t *car = obj_car(obj);
+        object_t *cdr = obj_cdr(obj);
+        obj_unref(obj);
+        obj = cdr;
+        list.array[list.count++] = car;
+        if (list.count == capacity - 1) {
+            capacity *= 2;
+            list.array = realloc(list.array, sizeof(object_t *) * capacity);
+        }
     }
-    if (!obj_is_null(len_obj)) {
-        obj_unref(len_obj);
-        return false;
-    }
-    obj_unref(len_obj);
-
-    list->count = length;
-    list->array = malloc(sizeof(object_t *) * length);
-    int index = 0;
-    object_t *val_obj = obj_ref(obj);
-    for (int i = 0; i < length; i++) {
-        list->array[i] = obj_car(val_obj);
-        object_t *cdr = obj_cdr(val_obj);
-        obj_unref(val_obj);
-        val_obj = cdr;
-    }
-    return true;
+    list.array[list.count++] = obj;
+    return list;
 }
 
 bool obj_list_eval_all(obj_list_t *list, env_t *env, error_t **error) {

@@ -8,7 +8,9 @@ typedef struct {
     int count;
 } obj_list_t;
 
-bool obj_get_list(object_t *obj, obj_list_t *list);
+// Flattens a CONS-list into an array of LISP objects (including the terminating NULL or other value).
+// Overwrites the list parameter.
+obj_list_t obj_flatten(object_t *obj);
 
 bool obj_list_eval_all(obj_list_t *list, env_t *env, error_t **error);
 

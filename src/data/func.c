@@ -69,11 +69,13 @@ object_t *obj_make_native_func(lisp_callback_t *callback) {
 static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
     lisp_func_t *func = (lisp_func_t *)object;
 
-    obj_list_t list;
-    if (!obj_get_list(args, &list)) {
+    obj_list_t list = obj_flatten(args);
+    if (list.count - 1 != func->arg_count) {
+        obj_list_free(&list);
         return result_error(NULL);
     }
-    if (list.count != func->arg_count) {
+    if (!obj_is_null(list.array[list.count - 1])) {
+        obj_list_free(&list);
         return result_error(NULL);
     }
     error_t *error;
@@ -90,7 +92,7 @@ static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
     }
 
     env_t *exec_env = env_new(func->captured_env);
-    for (int i = 0; i < list.count; i++) {
+    for (int i = 0; i < func->arg_count; i++) {
         env_define(exec_env, func->args[i], list.array[i]);
     }
     if (func->name != NULL) {
