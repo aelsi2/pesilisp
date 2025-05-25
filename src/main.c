@@ -4,8 +4,9 @@
 #include "data/list.h"
 #include "data/object.h"
 #include "data/primitives.h"
-#include "data/symbol.h"
+#include "parser.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 result_t lisp_add(object_t *func, env_t *env, object_t *args) {
     intval_t result = 0;
@@ -32,34 +33,47 @@ result_t lisp_add(object_t *func, env_t *env, object_t *args) {
     return result_success(obj_make_int(result));
 }
 
+result_t lisp_quote(object_t *func, env_t *env, object_t *args) {
+    return result_success(obj_car(args));
+}
+
 int main() {
     object_t *add_func = obj_make_native_func(lisp_add);
+    object_t *quote_func = obj_make_native_func(lisp_quote);
     env_t *env = env_new(NULL);
     env_define(env, "+", add_func);
+    env_define(env, "quote", quote_func);
+    env_define(env, "T", T);
+    env_define(env, "NIL", NIL);
     add_func = obj_unref(add_func);
+    quote_func = obj_unref(quote_func);
 
-    object_t *symbol = obj_make_sym("+");
-    object_t *arg1 = obj_make_int(3);
-    object_t *arg2 = obj_make_int(7);
+    fprintf(stdout, "Welcome to PesiLISP\nType (help) to list the standard functions.\n");
+    char *buffer = NULL;
+    size_t size;
+    while (true) {
+        fprintf(stdout, ">> ");
+        getline(&buffer, &size, stdin);
+        if (feof(stdin)) {
+            fprintf(stdout, "\n");
+            break;
+        }
+        result_t parse_result = parse(buffer);
+        if (result_is_error(&parse_result)) {
+            continue;
+        }
+        result_t eval_result = obj_eval(parse_result.object, env);
+        obj_unref(parse_result.object);
 
-    object_t *args1 = obj_cons(arg2, NIL);
-    object_t *args2 = obj_cons(arg1, args1);
-    object_t *expr = obj_cons(symbol, args2);
-    args2 = obj_unref(args2);
-    args1 = obj_unref(args1);
-    arg2 = obj_unref(arg2);
-    arg1 = obj_unref(arg1);
-    symbol = obj_unref(symbol);
+        if (result_is_error(&eval_result)) {
+            continue;
+        }
 
-    object_t *result = obj_eval(expr, env).object;
-
-    obj_print(expr, stdout);
-    fputc('\n', stdout);
-    obj_print(result, stdout);
-    fputc('\n', stdout);
-
-    obj_unref(result);
-    obj_unref(expr);
+        obj_print(eval_result.object, stdout);
+        fputc('\n', stdout);
+        obj_unref(eval_result.object);
+    }
+    free(buffer);
     env_free(env);
 
     return 0;

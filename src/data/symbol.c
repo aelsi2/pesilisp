@@ -12,6 +12,9 @@ typedef struct {
 
 static result_t symbol_eval(object_t *obj, env_t *env) {
     symbol_t *sym = (symbol_t *)obj;
+    if (!env_is_defined(env, sym->name)) {
+        return result_error(NULL);
+    }
     return result_success(env_get(env, sym->name));
 }
 
