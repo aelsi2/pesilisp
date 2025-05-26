@@ -1,4 +1,4 @@
-#include "list.h"
+#include "modules.h"
 #include "utils.h"
 #include "data/cons.h"
 
@@ -51,7 +51,8 @@ static result_t lisp_list(object_t *func, env_t *env, object_t *args) {
 
     return result_success(result);
 }
-void env_load_list(env_t *env) {
+
+void env_load_lists(env_t *env) {
     env_register(env, "CONS", lisp_cons);
     env_register(env, "CAR", lisp_car);
     env_register(env, "CDR", lisp_cdr);

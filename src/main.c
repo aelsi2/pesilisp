@@ -1,11 +1,7 @@
 #include "data/environment.h"
 #include "data/object.h"
-#include "funcs/arithmetic.h"
-#include "funcs/base.h"
-#include "funcs/boolean.h"
-#include "funcs/list.h"
+#include "funcs/modules.h"
 #include "parser.h"
-#include "interactive.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,7 +17,7 @@ int main() {
     env_load_base(env);
     env_load_arithmetic(env);
     env_load_boolean(env);
-    env_load_list(env);
+    env_load_lists(env);
     env_load_interactive(env);
 
     parser_t *parser = parser_new(stdin, "stdin");
