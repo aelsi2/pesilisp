@@ -71,11 +71,9 @@ static result_t lisp_if(object_t *func, env_t *env, object_t *args) {
 }
 
 void env_load_boolean(env_t *env) {
-    env_define(env, "T", T);
-    env_define(env, "NIL", NIL);
-    env_register(env, "or", lisp_bool_or);
-    env_register(env, "and", lisp_bool_and);
-    env_register(env, "not", lisp_bool_not);
-    env_register(env, "null", lisp_bool_not);
-    env_register(env, "if", lisp_if);
+    env_register(env, "OR", lisp_bool_or);
+    env_register(env, "AND", lisp_bool_and);
+    env_register(env, "NOT", lisp_bool_not);
+    env_register(env, "NULL", lisp_bool_not);
+    env_register(env, "IF", lisp_if);
 }

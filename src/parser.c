@@ -67,7 +67,7 @@ static result_t parse_atom(const char **str) {
     size_t count = 0;
     char *name = malloc(capacity);
     while (isatom(peek(str))) {
-        name[count++] = consume(str);
+        name[count++] = toupper(consume(str));
         if (count == capacity - 1) {
             capacity *= 2;
             name = realloc(name, capacity);
@@ -149,7 +149,7 @@ static result_t parse_quote(const char **str) {
     if (result_is_error(&result)) {
         return result;
     }
-    object_t *symbol = obj_make_sym("quote");
+    object_t *symbol = obj_make_sym("QUOTE");
     object_t *cons_inner = obj_cons(result.object, NIL);
     object_t *cons_outer = obj_cons(symbol, cons_inner);
     obj_unref(cons_inner);

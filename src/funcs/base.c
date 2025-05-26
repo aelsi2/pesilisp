@@ -30,7 +30,7 @@ static result_t lisp_exit(object_t *func, env_t *env, object_t *args) {
 }
 
 void env_load_base(env_t *env) {
-    env_register(env, "quote", lisp_quote);
-    env_register(env, "exit", lisp_exit);
-    env_register(env, "quit", lisp_exit);
+    env_register(env, "QUOTE", lisp_quote);
+    env_register(env, "EXIT", lisp_exit);
+    env_register(env, "QUIT", lisp_exit);
 }

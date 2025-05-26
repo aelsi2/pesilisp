@@ -213,8 +213,8 @@ void env_load_arithmetic(env_t *env) {
     env_register(env, "-", lisp_int_sub);
     env_register(env, "*", lisp_int_mul);
     env_register(env, "/", lisp_int_div);
-    env_register(env, "mod", lisp_int_mod);
-    env_register(env, "rem", lisp_int_rem);
+    env_register(env, "MOD", lisp_int_mod);
+    env_register(env, "REM", lisp_int_rem);
     env_register(env, "=", lisp_int_eq);
     env_register(env, "<", lisp_int_lt);
     env_register(env, ">", lisp_int_gt);
