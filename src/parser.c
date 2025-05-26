@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 static result_t parse_object(const char **str);
 
@@ -23,7 +24,7 @@ static void skip_whitespace(const char **str) {
     }
 }
 
-static bool issym(char ch) {
+static bool isatom(char ch) {
     if (isspace(ch)) {
         return false;
     }
@@ -37,11 +38,35 @@ static bool issym(char ch) {
     return true;
 }
 
-static result_t parse_symbol(const char **str) {
+static bool try_parse_int(const char *str, intval_t *result) {
+    intval_t res = 0;
+    bool negative = false;
+    if (*str == '-') {
+        negative = true;
+        str++;
+    }
+    int index = 0;
+    while (str[index]) {
+        char ch = str[index++];
+        if (isdigit(ch)) {
+            res *= 10;
+            res += ch - '0';
+        } else {
+            return false;
+        }
+    }
+    if (negative) {
+        res = -res;
+    }
+    *result = res;
+    return index != 0;
+}
+
+static result_t parse_atom(const char **str) {
     size_t capacity = 16;
     size_t count = 0;
     char *name = malloc(capacity);
-    while (issym(peek(str))) {
+    while (isatom(peek(str))) {
         name[count++] = consume(str);
         if (count == capacity - 1) {
             capacity *= 2;
@@ -49,26 +74,20 @@ static result_t parse_symbol(const char **str) {
         }
     }
     name[count] = '\0';
-    object_t *object = obj_make_sym(name);
+
+    object_t *object;
+    intval_t int_value;
+    if (!strcmp(name, "T")) {
+        object = T;
+    } else if (!strcmp(name, "NIL")) {
+        object = NIL;
+    } else if (try_parse_int(name, &int_value)) {
+        object = obj_make_int(int_value);
+    } else {
+        object = obj_make_sym(name);
+    }
     free(name);
     return result_success(object);
-}
-
-static result_t parse_integer(const char **str) {
-    bool negative = false;
-    intval_t value = 0;
-    if (peek(str) == '-') {
-        negative = true;
-        consume(str);
-    }
-    if (!isdigit(peek(str))) {
-        return result_error(NULL);
-    }
-    value = consume(str) - '0';
-    while (isdigit(peek(str))) {
-        value = value * 10 + (consume(str) - '0');
-    }
-    return result_success(obj_make_int(negative ? -value : value));
 }
 
 static result_t parse_list_tail(const char **str) {
@@ -146,10 +165,8 @@ static result_t parse_object(const char **str) {
         return parse_list(str);
     } else if (ch == '\'') {
         return parse_quote(str);
-    } else if (isdigit(ch) || ch == '-') {
-        return parse_integer(str);
-    } else if (issym(ch)) {
-        return parse_symbol(str);
+    } else if (isatom(ch)) {
+        return parse_atom(str);
     } else {
         return result_error(NULL);
     }
