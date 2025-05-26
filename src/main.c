@@ -50,16 +50,12 @@ int main() {
         }
 
         error_t *error = eval_result.error;
-        if (!error) {
-            continue;
-        }
-        if (error->type == ERROR_EXIT) {
+        if (error && error->type == ERROR_EXIT) {
             result = error->exit_code;
             error_free(error);
             break;
-        } else {
-            error_print(error, stderr);
-        }
+        } 
+        error_print(error, stderr);
         error_free(error);
         continue;
     }
