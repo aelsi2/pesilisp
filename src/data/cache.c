@@ -110,8 +110,8 @@ static void cache_grow(cache_t *cache) {
         if (!old_cell->value) {
             continue;
         }
-        size_t index = cache_get_index(cache, &old_cell->key);
-        cache->cells[index] = *old_cell;
+        kvp_t *new_cell = cache_find_cell(cache, &old_cell->key);
+        *new_cell = *old_cell;
     }
     free(old_cells);
 }

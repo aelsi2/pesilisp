@@ -71,8 +71,8 @@ static void env_grow(env_t *env) {
         if (!old_cell->key) {
             continue;
         }
-        size_t index = env_get_index(env, old_cell->key);
-        env->cells[index] = *old_cell;
+        kvp_t *new_cell = env_find_cell(env, old_cell->key);
+        *new_cell = *old_cell;
     }
     free(old_cells);
 }
