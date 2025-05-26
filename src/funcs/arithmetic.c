@@ -4,7 +4,7 @@
 static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
 
     intval_t result = 0;
     for (int i = 0; i < list.count; i++) {
@@ -19,7 +19,7 @@ static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_at_least(list, 1);
 
     ensure_integer(list, 0);
@@ -39,7 +39,7 @@ static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
 
     intval_t result = 1;
     for (int i = 0; i < list.count; i++) {
@@ -54,7 +54,7 @@ static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_at_least(list, 1);
 
     ensure_integer(list, 0);
@@ -74,7 +74,7 @@ static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_exactly(list, 2);
 
     ensure_integer(list, 0);
@@ -93,7 +93,7 @@ static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_exactly(list, 2);
 
     ensure_integer(list, 0);
@@ -109,7 +109,7 @@ static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_at_least(list, 1);
 
     ensure_integer(list, 0);
@@ -130,7 +130,7 @@ static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_at_least(list, 1);
 
     ensure_integer(list, 0);
@@ -153,7 +153,7 @@ static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_at_least(list, 1);
 
     ensure_integer(list, 0);
@@ -176,7 +176,7 @@ static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_at_least(list, 1);
 
     ensure_integer(list, 0);
@@ -199,7 +199,7 @@ static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
 static result_t lisp_int_ge(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
     read_args(list, args, env);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
     ensure_args_at_least(list, 1);
 
     ensure_integer(list, 0);

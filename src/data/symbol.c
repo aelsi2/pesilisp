@@ -28,7 +28,7 @@ static hash_t symbol_hash(const object_t *obj) {
     return hash_str(sym->name);
 }
 
-static bool symbol_equal(const object_t *obj, const object_t *other) {
+static bool symbol_equals(const object_t *obj, const object_t *other) {
     if (!obj_is_sym(other)) {
         return false;
     }
@@ -48,6 +48,7 @@ const obj_type_t TYPE_SYM = (obj_type_t){
     .eval = symbol_eval,
     .print = symbol_print,
     .hash = symbol_hash,
+    .equals = symbol_equals,
     .free = symbol_free,
 };
 

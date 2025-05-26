@@ -15,6 +15,7 @@ int main() {
 
     env_t *env = env_new(NULL);
     env_load_base(env);
+    env_load_funcdef(env);
     env_load_arithmetic(env);
     env_load_boolean(env);
     env_load_lists(env);
@@ -55,7 +56,7 @@ int main() {
             result = error->exit_code;
             error_free(error);
             break;
-        } 
+        }
         error_print(error, stderr);
         error_free(error);
         continue;

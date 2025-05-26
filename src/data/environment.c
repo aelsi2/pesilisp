@@ -54,7 +54,13 @@ static kvp_t *env_find_cell(const env_t *env, const char *name) {
 
 bool env_is_defined(const env_t *env, const char *name) {
     kvp_t *cell = env_find_cell(env, name);
-    return cell->key != NULL;
+    if (cell->key) {
+        return true;
+    }
+    if (env->parent) {
+        return env_is_defined(env->parent, name);
+    }
+    return false;
 }
 
 static void env_grow(env_t *env) {
@@ -98,7 +104,9 @@ object_t *env_get(const env_t *env, const char *name) {
     kvp_t *cell = env_find_cell(env, name);
     if (cell->key) {
         return obj_ref(cell->value);
-    } else {
+    } if (env->parent){
+        return env_get(env->parent, name);
+    }else {
         return NIL;
     }
 }

@@ -15,7 +15,7 @@ static result_t lisp_exit(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
     read_args(list, args, env);
     ensure_args_between(list, 0, 1);
-    args_eval_all(list, env);
+    args_eval_all(list, env, dirty);
 
     int exit_code = 0;
     if (list.count == 1) {

@@ -80,6 +80,7 @@ const obj_type_t TYPE_CONS = (obj_type_t){
     .eval = cons_eval,
     .print = cons_print,
     .hash = cons_hash,
+    .equals = cons_equals,
     .free = cons_free,
 };
 

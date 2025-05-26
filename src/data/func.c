@@ -39,6 +39,8 @@ static void lisp_func_free(object_t *obj) {
     for (int i = 0; i < func->arg_count; i++) {
         free(func->args[i]);
     }
+    free(func->args);
+    free(func->name);
     cache_free(func->cache);
     env_free(func->captured_env);
     obj_unref(func->value);
@@ -104,7 +106,7 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env, boo
         env_define(exec_env, func->name, object);
     }
 
-    bool result_dirty;
+    bool result_dirty = false;
     result_t result = obj_eval(func->value, exec_env, &result_dirty);
     bool result_cache = !result_dirty && !result_is_error(&result) &&
                         should_cache_result(result.object);
@@ -119,7 +121,7 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env, boo
     return result;
 }
 
-object_t *obj_make_lisp_func(char *name, int arg_count, const char **args,
+object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
                              object_t *value, env_t *environment) {
     lisp_func_t *func = obj_alloc_default(&TYPE_LISP_FUNC, true);
 

@@ -13,7 +13,7 @@ static inline bool obj_is_func(const object_t *object) {
 
 object_t *obj_make_native_func(lisp_callback_t *callback);
 
-object_t *obj_make_lisp_func(char *name, int arg_count, const char **args,
+object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
                              object_t *value, env_t *environment);
 
 result_t obj_call_func(object_t *func, object_t *args, env_t *env, bool *dirty);

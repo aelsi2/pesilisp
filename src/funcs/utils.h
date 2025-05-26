@@ -9,17 +9,16 @@
 
 #define free_args(list) obj_list_free(&list)
 
-#define args_eval_all(list, env)                                               \
+#define args_eval_all(list, env, dirty)                                        \
     do {                                                                       \
         for (int i = 0; i < list.count; i++) {                                 \
-            arg_eval(list, env, i);                                            \
+            arg_eval(list, i, env, dirty);                                     \
         }                                                                      \
     } while (0)
 
-#define arg_eval(list, env, index)                                             \
+#define arg_eval(list, index, env, dirty)                                      \
     do {                                                                       \
-        bool dirty;                                                            \
-        result_t arg_eval_res = obj_eval(list.array[index], env, &dirty);      \
+        result_t arg_eval_res = obj_eval(list.array[index], env, dirty);       \
         if (result_is_error(&arg_eval_res)) {                                  \
             obj_list_free(&list);                                              \
             return arg_eval_res;                                               \
