@@ -77,7 +77,6 @@ const obj_type_t TYPE_CONS = (obj_type_t){
     .name = "CONS",
     .base = &TYPE_T,
     .size = sizeof(cons_t),
-    .is_primitive = false,
     .eval = cons_eval,
     .print = cons_print,
     .hash = cons_hash,
@@ -85,7 +84,8 @@ const obj_type_t TYPE_CONS = (obj_type_t){
 };
 
 object_t *obj_cons(object_t *car, object_t *cdr) {
-    cons_t *cons = obj_alloc_default(&TYPE_CONS);
+    bool is_mutable = obj_is_mutable(car) || obj_is_mutable(cdr);
+    cons_t *cons = obj_alloc_default(&TYPE_CONS, is_mutable);
     cons->car = obj_ref(car);
     cons->cdr = obj_ref(cdr);
     return &cons->base;
@@ -106,4 +106,3 @@ object_t *obj_cdr(object_t *obj) {
     cons_t *cons = (cons_t *)obj;
     return obj_ref(cons->cdr);
 }
-

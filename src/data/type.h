@@ -11,7 +11,6 @@ struct obj_type_s {
     char *name;
     const obj_type_t *base;
     size_t size;
-    bool is_primitive;
     result_t (*eval)(object_t *object, env_t *env);
     void (*print)(const object_t *object, FILE *file);
     hash_t (*hash)(const object_t *object);
@@ -21,12 +20,13 @@ struct obj_type_s {
 
 struct object_s {
     const obj_type_t *type;
+    bool is_mutable;
     int ref_count;
 };
 
 bool type_subtype_of(const obj_type_t* type, const obj_type_t* super);
 
-void *obj_alloc_default(const obj_type_t *const type);
+void *obj_alloc_default(const obj_type_t *const type, bool is_ref_safe);
 
 void obj_free_default(object_t *object);
 

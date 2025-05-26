@@ -37,10 +37,13 @@ inline static bool result_is_error(result_t *result) {
     return result->object == NULL;
 }
 
+// Checks if the LISP object is mmutable.
+bool obj_is_mutable(const object_t *object);
+
 // Gets the most specific type of the LISP object.
 const obj_type_t *obj_get_type(const object_t *object);
 
-// Checks if the object is of the specified type.
+// Checks if the LISP object is of the specified type.
 bool obj_of_type(const object_t *object, const obj_type_t *type);
 
 // Evaluates the LISP object and returns a new object or an error.

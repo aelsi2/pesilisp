@@ -17,7 +17,6 @@ const obj_type_t TYPE_FUNC = (obj_type_t){
     .name = "FUNC",
     .base = &TYPE_T,
     .size = sizeof(func_t),
-    .is_primitive = true,
     .eval = obj_eval_self,
     .print = obj_print_default,
     .hash = obj_hash_default,
@@ -52,7 +51,6 @@ static const obj_type_t TYPE_LISP_FUNC = (obj_type_t){
     .name = "FUNC",
     .base = &TYPE_FUNC,
     .size = sizeof(lisp_func_t),
-    .is_primitive = false,
     .eval = obj_eval_self,
     .print = obj_print_default,
     .hash = obj_hash_default,
@@ -61,7 +59,7 @@ static const obj_type_t TYPE_LISP_FUNC = (obj_type_t){
 };
 
 object_t *obj_make_native_func(lisp_callback_t *callback) {
-    func_t *func = obj_alloc_default(&TYPE_FUNC);
+    func_t *func = obj_alloc_default(&TYPE_FUNC, false);
     func->callback = callback;
     return (object_t *)func;
 }
@@ -106,7 +104,7 @@ static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
 
 object_t *obj_make_lisp_func(char *name, int arg_count, const char **args,
                              object_t *value, env_t *environment) {
-    lisp_func_t *func = obj_alloc_default(&TYPE_LISP_FUNC);
+    lisp_func_t *func = obj_alloc_default(&TYPE_LISP_FUNC, true);
 
     if (name != NULL) {
         func->name = malloc(strlen(name) + 1);

@@ -12,9 +12,10 @@ bool type_subtype_of(const obj_type_t *type, const obj_type_t *super) {
     return false;
 }
 
-void *obj_alloc_default(const obj_type_t *const type) {
+void *obj_alloc_default(const obj_type_t *const type, bool is_mutable) {
     object_t *object = calloc(1, type->size);
     object->type = type;
+    object->is_mutable = is_mutable;
     object->ref_count = 1;
     return object;
 }

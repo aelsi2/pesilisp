@@ -1,6 +1,5 @@
 #include "cache.h"
 #include "data/primitives.h"
-#include "data/type.h"
 #include <stdlib.h>
 
 #define LOAD_FACTOR 0.75
@@ -39,7 +38,7 @@ void cache_free(cache_t *cache) {
 
 bool should_cache(obj_list_t *args) {
     for (int i = 0; i < args->count; i++) {
-        if (!obj_get_type(args->array[i])->is_primitive) {
+        if (obj_is_mutable(args->array[i])) {
             return false;
         }
     }

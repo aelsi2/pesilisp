@@ -45,7 +45,6 @@ const obj_type_t TYPE_SYM = (obj_type_t){
     .name = "SYMBOL",
     .base = &TYPE_T,
     .size = sizeof(symbol_t),
-    .is_primitive = true,
     .eval = symbol_eval,
     .print = symbol_print,
     .hash = symbol_hash,
@@ -53,7 +52,7 @@ const obj_type_t TYPE_SYM = (obj_type_t){
 };
 
 object_t *obj_make_sym(const char *name) {
-    symbol_t *symbol = obj_alloc_default(&TYPE_SYM);
+    symbol_t *symbol = obj_alloc_default(&TYPE_SYM, false);
     symbol->name = malloc(strlen(name) + 1);
     strcpy(symbol->name, name);
     return &symbol->base;

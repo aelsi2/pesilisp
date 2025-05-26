@@ -2,6 +2,10 @@
 #include "type.h"
 #include "primitives.h"
 
+bool obj_is_mutable(const object_t *object) {
+    return object->is_mutable;
+}
+
 const obj_type_t *obj_get_type(const object_t *object) {
     return object->type;
 }
