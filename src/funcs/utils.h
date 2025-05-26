@@ -11,10 +11,8 @@
 
 #define args_eval_all(list, env)                                               \
     do {                                                                       \
-        error_t *error;                                                        \
-        if (!obj_list_eval_all(&list, env, &error)) {                          \
-            obj_list_free(&list);                                              \
-            return result_error(error);                                        \
+        for (int i = 0; i < list.count; i++) {                                 \
+            arg_eval(list, env, i);                                            \
         }                                                                      \
     } while (0)
 
@@ -31,7 +29,7 @@
 
 #define ensure_args_at_least(list, min_count)                                  \
     do {                                                                       \
-        if (list.count < min_count + 1) {                                      \
+        if (list.count < min_count) {                                          \
             obj_list_free(&list);                                              \
             return result_error(NULL);                                         \
         }                                                                      \
@@ -39,11 +37,11 @@
 
 #define ensure_args_between(list, min_count, max_count)                        \
     do {                                                                       \
-        if (list.count < min_count + 1) {                                      \
+        if (list.count < min_count) {                                          \
             obj_list_free(&list);                                              \
             return result_error(NULL);                                         \
         }                                                                      \
-        if (list.count > max_count + 1) {                                      \
+        if (list.count > max_count) {                                          \
             obj_list_free(&list);                                              \
             return result_error(NULL);                                         \
         }                                                                      \
@@ -51,19 +49,7 @@
 
 #define ensure_args_exactly(list, exact_count)                                 \
     do {                                                                       \
-        if (list.count != exact_count + 1) {                                   \
-            obj_list_free(&list);                                              \
-            return result_error(NULL);                                         \
-        }                                                                      \
-    } while (0)
-
-#define arg_count(list) (list.count - 1)
-
-#define is_unary(list) (list.count == 2)
-
-#define ensure_null_term(list)                                                 \
-    do {                                                                       \
-        if (!obj_is_null(list.array[list.count - 1])) {                        \
+        if (list.count != exact_count) {                                       \
             obj_list_free(&list);                                              \
             return result_error(NULL);                                         \
         }                                                                      \

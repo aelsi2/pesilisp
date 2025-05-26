@@ -4,10 +4,9 @@
 static result_t lisp_int_add(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
-    ensure_null_term(list);
 
     intval_t result = 0;
-    for (int i = 0; i < arg_count(list); i++) {
+    for (int i = 0; i < list.count; i++) {
         ensure_integer(list, i);
         result += obj_get_int(list.array[i]);
     }
@@ -20,14 +19,13 @@ static result_t lisp_int_sub(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     intval_t result = obj_get_int(list.array[0]);
-    if (is_unary(list)) {
+    if (list.count == 1) {
         result *= -1;
     }
-    for (int i = 1; i < arg_count(list); i++) {
+    for (int i = 1; i < list.count; i++) {
         ensure_integer(list, i);
         result -= obj_get_int(list.array[i]);
     }
@@ -39,10 +37,9 @@ static result_t lisp_int_sub(object_t *func, env_t *env, object_t *args) {
 static result_t lisp_int_mul(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
-    ensure_null_term(list);
 
     intval_t result = 1;
-    for (int i = 0; i < arg_count(list); i++) {
+    for (int i = 0; i < list.count; i++) {
         ensure_integer(list, i);
         result *= obj_get_int(list.array[i]);
     }
@@ -55,14 +52,13 @@ static result_t lisp_int_div(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     intval_t result = obj_get_int(list.array[0]);
-    if (is_unary(list)) {
+    if (list.count == 1) {
         result = 1 / result;
     }
-    for (int i = 1; i < arg_count(list); i++) {
+    for (int i = 1; i < list.count; i++) {
         ensure_integer(list, i);
         result /= obj_get_int(list.array[i]);
     }
@@ -75,7 +71,6 @@ static result_t lisp_int_mod(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_exactly(list, 2);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     ensure_integer(list, 1);
@@ -94,7 +89,6 @@ static result_t lisp_int_rem(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_exactly(list, 2);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     ensure_integer(list, 1);
@@ -110,12 +104,11 @@ static result_t lisp_int_eq(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     intval_t value = obj_get_int(list.array[0]);
     bool result = true;
-    for (int i = 1; i < arg_count(list); i++) {
+    for (int i = 1; i < list.count; i++) {
         ensure_integer(list, i);
         if (obj_get_int(list.array[i]) != value) {
             result = false;
@@ -131,12 +124,11 @@ static result_t lisp_int_lt(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     intval_t value = obj_get_int(list.array[0]);
     bool result = true;
-    for (int i = 1; i < arg_count(list); i++) {
+    for (int i = 1; i < list.count; i++) {
         ensure_integer(list, i);
         intval_t new_val = obj_get_int(list.array[i]);
         if (new_val <= value) {
@@ -154,12 +146,11 @@ static result_t lisp_int_gt(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     intval_t value = obj_get_int(list.array[0]);
     bool result = true;
-    for (int i = 1; i < arg_count(list); i++) {
+    for (int i = 1; i < list.count; i++) {
         ensure_integer(list, i);
         intval_t new_val = obj_get_int(list.array[i]);
         if (new_val >= value) {
@@ -177,12 +168,11 @@ static result_t lisp_int_le(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     intval_t value = obj_get_int(list.array[0]);
     bool result = true;
-    for (int i = 1; i < arg_count(list); i++) {
+    for (int i = 1; i < list.count; i++) {
         ensure_integer(list, i);
         intval_t new_val = obj_get_int(list.array[i]);
         if (new_val < value) {
@@ -200,12 +190,11 @@ static result_t lisp_int_ge(object_t *func, env_t *env, object_t *args) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
-    ensure_null_term(list);
 
     ensure_integer(list, 0);
     intval_t value = obj_get_int(list.array[0]);
     bool result = true;
-    for (int i = 1; i < arg_count(list); i++) {
+    for (int i = 1; i < list.count; i++) {
         ensure_integer(list, i);
         intval_t new_val = obj_get_int(list.array[i]);
         if (new_val > value) {

@@ -70,11 +70,7 @@ static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
     lisp_func_t *func = (lisp_func_t *)object;
 
     obj_list_t list = obj_flatten(args);
-    if (list.count - 1 != func->arg_count) {
-        obj_list_free(&list);
-        return result_error(NULL);
-    }
-    if (!obj_is_null(list.array[list.count - 1])) {
+    if (list.count != func->arg_count) {
         obj_list_free(&list);
         return result_error(NULL);
     }

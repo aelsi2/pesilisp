@@ -1,5 +1,7 @@
 #pragma once
 
+#include "data/cons.h"
+#include "data/primitives.h"
 #include "object.h"
 #include <stdbool.h>
 
@@ -8,9 +10,17 @@ typedef struct {
     int count;
 } obj_list_t;
 
-// Flattens a CONS-list into an array of LISP objects (including the terminating NULL or other value).
+// Checks if a LISP object is a list (a CONS cell or NIL)
+static inline bool obj_is_list(object_t *obj) {
+    return obj_is_null(obj) || obj_is_cons(obj);
+}
+
+// Flattens a CONS-list into an array of LISP objects
 // Overwrites the list parameter.
 obj_list_t obj_flatten(object_t *obj);
+
+// Unflattens an array of LISP objects back into a CONS-list.
+object_t *obj_list_unflatten(obj_list_t *list);
 
 bool obj_list_eval_all(obj_list_t *list, env_t *env, error_t **error);
 

@@ -20,8 +20,18 @@ obj_list_t obj_flatten(object_t *obj) {
             list.array = realloc(list.array, sizeof(object_t *) * capacity);
         }
     }
-    list.array[list.count++] = obj;
+    list.array[list.count] = obj;
     return list;
+}
+
+object_t *obj_list_unflatten(obj_list_t *list) {
+    object_t *result = NIL;
+    for (int i = list->count - 1; i >= 0; i--) {
+        object_t *new_res = obj_cons(list->array[i], result);
+        obj_unref(result);
+        result = new_res;
+    }
+    return result;
 }
 
 bool obj_list_eval_all(obj_list_t *list, env_t *env, error_t **error) {
@@ -39,14 +49,14 @@ bool obj_list_eval_all(obj_list_t *list, env_t *env, error_t **error) {
 
 void obj_list_copy(obj_list_t *dst, const obj_list_t *src) {
     dst->count = src->count;
-    dst->array = malloc(sizeof(object_t *) * dst->count);
-    for (int i = 0; i < dst->count; i++) {
+    dst->array = malloc(sizeof(object_t *) * (dst->count + 1));
+    for (int i = 0; i < dst->count + 1; i++) {
         dst->array[i] = obj_ref(src->array[i]);
     }
 }
 
 void obj_list_free(obj_list_t *list) {
-    for (int i = 0; i < list->count; i++) {
+    for (int i = 0; i < list->count + 1; i++) {
         obj_unref(list->array[i]);
     }
     free(list->array);

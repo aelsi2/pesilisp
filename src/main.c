@@ -3,6 +3,7 @@
 #include "funcs/arithmetic.h"
 #include "funcs/base.h"
 #include "funcs/boolean.h"
+#include "funcs/list.h"
 #include "parser.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +15,7 @@ int main() {
     env_load_base(env);
     env_load_arithmetic(env);
     env_load_boolean(env);
+    env_load_list(env);
 
     fprintf(stdout, "Welcome to PesiLISP\nType (help) to list the standard functions or (quit) to leave.\n");
     char *buffer = NULL;
