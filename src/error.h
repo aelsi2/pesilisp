@@ -20,6 +20,8 @@ typedef struct {
 
 error_t *error_exit(int code);
 
+error_t *error_interactive();
+
 void error_free(error_t *error);
 
 void error_print(error_t *error, FILE *file);
