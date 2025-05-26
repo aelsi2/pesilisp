@@ -1,7 +1,8 @@
-#include "modules.h"
 #include "funcs/utils.h"
+#include "modules.h"
 
-static result_t lisp_bool_or(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_bool_or(object_t *func, object_t *args, env_t *env,
+                             bool *dirty) {
     read_args(list, args, env);
     arg_eval(list, env, list.count);
 
@@ -18,7 +19,8 @@ static result_t lisp_bool_or(object_t *func, env_t *env, object_t *args) {
     return result_success(result);
 }
 
-static result_t lisp_bool_and(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_bool_and(object_t *func, object_t *args, env_t *env,
+                              bool *dirty) {
     read_args(list, args, env);
     arg_eval(list, env, list.count);
 
@@ -36,7 +38,8 @@ static result_t lisp_bool_and(object_t *func, env_t *env, object_t *args) {
     return result_success(result);
 }
 
-static result_t lisp_bool_not(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_bool_not(object_t *func, object_t *args, env_t *env,
+                              bool *dirty) {
     read_args(list, args, env);
     ensure_args_exactly(list, 1);
     args_eval_all(list, env);
@@ -47,7 +50,8 @@ static result_t lisp_bool_not(object_t *func, env_t *env, object_t *args) {
     return result_success(result);
 }
 
-static result_t lisp_if(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_if(object_t *func, object_t *args, env_t *env,
+                        bool *dirty) {
     read_args(list, args, env);
     ensure_args_between(list, 2, 3);
     arg_eval(list, env, list.count);

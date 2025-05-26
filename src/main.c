@@ -40,7 +40,8 @@ int main() {
             continue;
         }
 
-        result_t eval_result = obj_eval(parse_result.object, env);
+        bool dirty;
+        result_t eval_result = obj_eval(parse_result.object, env, &dirty);
         obj_unref(parse_result.object);
         if (!result_is_error(&eval_result)) {
             obj_print(eval_result.object, stdout);

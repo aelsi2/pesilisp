@@ -16,6 +16,7 @@ struct cache_s {
     size_t count;
 };
 
+
 cache_t *cache_new() {
     cache_t *cache = malloc(sizeof(cache_t));
     cache->count = 0;
@@ -36,14 +37,6 @@ void cache_free(cache_t *cache) {
     free(cache);
 }
 
-bool should_cache(obj_list_t *args) {
-    for (int i = 0; i < args->count; i++) {
-        if (obj_is_mutable(args->array[i])) {
-            return false;
-        }
-    }
-    return true;
-}
 
 static size_t cache_get_index(const cache_t *cache, obj_list_t *args) {
     hash_t hash = hash_default;

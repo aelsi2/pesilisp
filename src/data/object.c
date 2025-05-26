@@ -14,8 +14,8 @@ bool obj_of_type(const object_t *object, const obj_type_t *type) {
     return type_subtype_of(object->type, type);
 }
 
-result_t obj_eval(object_t *object, env_t *env) {
-    return object->type->eval(object, env);
+result_t obj_eval(object_t *object, env_t *env, bool *dirty) {
+    return object->type->eval(object, env, dirty);
 }
 
 void obj_print(const object_t *object, FILE *file) {

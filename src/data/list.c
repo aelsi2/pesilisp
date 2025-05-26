@@ -34,9 +34,9 @@ object_t *obj_list_unflatten(obj_list_t *list) {
     return result;
 }
 
-bool obj_list_eval_all(obj_list_t *list, env_t *env, error_t **error) {
+bool obj_list_eval_all(obj_list_t *list, env_t *env, bool *dirty, error_t **error) {
     for (int i = 0; i < list->count; i++) {
-        result_t eval_res = obj_eval(list->array[i], env);
+        result_t eval_res = obj_eval(list->array[i], env, dirty);
         if (result_is_error(&eval_res)) {
             *error = eval_res.error;
             return false;

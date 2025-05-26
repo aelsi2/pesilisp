@@ -39,9 +39,7 @@ static void lisp_func_free(object_t *obj) {
     for (int i = 0; i < func->arg_count; i++) {
         free(func->args[i]);
     }
-    if (func->cache) {
-        cache_free(func->cache);
-    }
+    cache_free(func->cache);
     env_free(func->captured_env);
     obj_unref(func->value);
     obj_free_default(obj);
@@ -64,7 +62,20 @@ object_t *obj_make_native_func(lisp_callback_t *callback) {
     return (object_t *)func;
 }
 
-static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
+static bool should_cache_args(obj_list_t *args) {
+    for (int i = 0; i < args->count; i++) {
+        if (obj_is_mutable(args->array[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static bool should_cache_result(object_t *result) {
+    return !obj_is_mutable(result);
+}
+
+static result_t lisp_func_call(object_t *object, object_t *args, env_t *env, bool *dirty) {
     lisp_func_t *func = (lisp_func_t *)object;
 
     obj_list_t list = obj_flatten(args);
@@ -73,14 +84,14 @@ static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
         return result_error(NULL);
     }
     error_t *error;
-    if (!obj_list_eval_all(&list, env, &error)) {
+    if (!obj_list_eval_all(&list, env, dirty, &error)) {
         obj_list_free(&list);
         return result_error(error);
     }
 
-    bool cache_enabled = func->cache != NULL && should_cache(&list);
+    bool args_cache = should_cache_args(&list);
     object_t *cached_result = NIL;
-    if (cache_enabled && cache_try_get(func->cache, &list, &cached_result)) {
+    if (args_cache && cache_try_get(func->cache, &list, &cached_result)) {
         obj_list_free(&list);
         return result_success(cached_result);
     }
@@ -93,9 +104,15 @@ static result_t lisp_func_call(object_t *object, env_t *env, object_t *args) {
         env_define(exec_env, func->name, object);
     }
 
-    result_t result = obj_eval(func->value, exec_env);
-    if (cache_enabled && !result_is_error(&result)) {
+    bool result_dirty;
+    result_t result = obj_eval(func->value, exec_env, &result_dirty);
+    bool result_cache = !result_dirty && !result_is_error(&result) &&
+                        should_cache_result(result.object);
+    if (args_cache && result_cache) {
         cache_remember(func->cache, &list, result.object);
+    }
+    if (result_dirty) {
+        *dirty = true;
     }
     obj_list_free(&list);
     env_free(exec_env);
@@ -127,10 +144,11 @@ object_t *obj_make_lisp_func(char *name, int arg_count, const char **args,
     return (object_t *)func;
 }
 
-result_t obj_call_func(object_t *object, env_t *env, object_t *args) {
+result_t obj_call_func(object_t *object, object_t *args, env_t *env,
+                       bool *dirty) {
     if (!obj_is_func(object)) {
         return result_error(NULL);
     }
     func_t *func = (func_t *)object;
-    return func->callback(object, env, args);
+    return func->callback(object, args, env, dirty);
 }

@@ -10,16 +10,16 @@ typedef struct {
     object_t *cdr;
 } cons_t;
 
-static result_t cons_eval(object_t *obj, env_t *env) {
+static result_t cons_eval(object_t *obj, env_t *env, bool *dirty) {
     cons_t *cons = (cons_t *)obj;
     object_t *args = cons->cdr;
 
-    result_t func_res = obj_eval(cons->car, env);
+    result_t func_res = obj_eval(cons->car, env, dirty);
     if (result_is_error(&func_res)) {
         return func_res;
     }
 
-    result_t result = obj_call_func(func_res.object, env, cons->cdr);
+    result_t result = obj_call_func(func_res.object, cons->cdr, env, dirty);
     obj_unref(func_res.object);
 
     return result;

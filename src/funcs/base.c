@@ -1,7 +1,8 @@
-#include "modules.h"
 #include "funcs/utils.h"
+#include "modules.h"
 
-static result_t lisp_quote(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_quote(object_t *func, object_t *args, env_t *env,
+                           bool *dirty) {
     read_args(list, args, env);
     ensure_args_exactly(list, 1);
     object_t *result = obj_ref(list.array[0]);
@@ -10,7 +11,8 @@ static result_t lisp_quote(object_t *func, env_t *env, object_t *args) {
     return result_success(result);
 }
 
-static result_t lisp_exit(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_exit(object_t *func, object_t *args, env_t *env,
+                          bool *dirty) {
     read_args(list, args, env);
     ensure_args_between(list, 0, 1);
     args_eval_all(list, env);

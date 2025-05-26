@@ -18,7 +18,8 @@
 
 #define arg_eval(list, env, index)                                             \
     do {                                                                       \
-        result_t arg_eval_res = obj_eval(list.array[index], env);              \
+        bool dirty;                                                            \
+        result_t arg_eval_res = obj_eval(list.array[index], env, &dirty);      \
         if (result_is_error(&arg_eval_res)) {                                  \
             obj_list_free(&list);                                              \
             return arg_eval_res;                                               \

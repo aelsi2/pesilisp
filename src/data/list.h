@@ -22,7 +22,7 @@ obj_list_t obj_flatten(object_t *obj);
 // Unflattens an array of LISP objects back into a CONS-list.
 object_t *obj_list_unflatten(obj_list_t *list);
 
-bool obj_list_eval_all(obj_list_t *list, env_t *env, error_t **error);
+bool obj_list_eval_all(obj_list_t *list, env_t *env, bool *dirty, error_t **error);
 
 void obj_list_copy(obj_list_t *dst, const obj_list_t *src);
 

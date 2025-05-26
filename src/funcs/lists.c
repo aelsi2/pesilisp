@@ -1,8 +1,9 @@
+#include "data/cons.h"
 #include "modules.h"
 #include "utils.h"
-#include "data/cons.h"
 
-static result_t lisp_cons(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_cons(object_t *func, object_t *args, env_t *env,
+                          bool *dirty) {
     read_args(list, args, env);
     ensure_args_exactly(list, 2);
     args_eval_all(list, env);
@@ -13,7 +14,8 @@ static result_t lisp_cons(object_t *func, env_t *env, object_t *args) {
     return result_success(result);
 }
 
-static result_t lisp_car(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_car(object_t *func, object_t *args, env_t *env,
+                         bool *dirty) {
     read_args(list, args, env);
     ensure_args_exactly(list, 1);
     args_eval_all(list, env);
@@ -28,7 +30,8 @@ static result_t lisp_car(object_t *func, env_t *env, object_t *args) {
     return result_success(result);
 }
 
-static result_t lisp_cdr(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_cdr(object_t *func, object_t *args, env_t *env,
+                         bool *dirty) {
     read_args(list, args, env);
     ensure_args_exactly(list, 1);
     args_eval_all(list, env);
@@ -43,7 +46,8 @@ static result_t lisp_cdr(object_t *func, env_t *env, object_t *args) {
     return result_success(result);
 }
 
-static result_t lisp_list(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_list(object_t *func, object_t *args, env_t *env,
+                          bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     object_t *result = obj_list_unflatten(&list);

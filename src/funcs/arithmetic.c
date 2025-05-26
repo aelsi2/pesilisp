@@ -1,7 +1,8 @@
 #include "modules.h"
 #include "utils.h"
 
-static result_t lisp_int_add(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
+                             bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
 
@@ -15,7 +16,8 @@ static result_t lisp_int_add(object_t *func, env_t *env, object_t *args) {
     return result_success(obj_make_int(result));
 }
 
-static result_t lisp_int_sub(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
+                             bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
@@ -34,7 +36,8 @@ static result_t lisp_int_sub(object_t *func, env_t *env, object_t *args) {
     return result_success(obj_make_int(result));
 }
 
-static result_t lisp_int_mul(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
+                             bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
 
@@ -48,7 +51,8 @@ static result_t lisp_int_mul(object_t *func, env_t *env, object_t *args) {
     return result_success(obj_make_int(result));
 }
 
-static result_t lisp_int_div(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
+                             bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
@@ -67,7 +71,8 @@ static result_t lisp_int_div(object_t *func, env_t *env, object_t *args) {
     return result_success(obj_make_int(result));
 }
 
-static result_t lisp_int_mod(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
+                             bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_exactly(list, 2);
@@ -85,7 +90,8 @@ static result_t lisp_int_mod(object_t *func, env_t *env, object_t *args) {
     return result_success(obj_make_int(result));
 }
 
-static result_t lisp_int_rem(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
+                             bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_exactly(list, 2);
@@ -100,7 +106,8 @@ static result_t lisp_int_rem(object_t *func, env_t *env, object_t *args) {
     return result_success(obj_make_int(result));
 }
 
-static result_t lisp_int_eq(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
+                            bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
@@ -120,7 +127,8 @@ static result_t lisp_int_eq(object_t *func, env_t *env, object_t *args) {
     return result_success(result ? T : NIL);
 }
 
-static result_t lisp_int_lt(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
+                            bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
@@ -142,7 +150,8 @@ static result_t lisp_int_lt(object_t *func, env_t *env, object_t *args) {
     return result_success(result ? T : NIL);
 }
 
-static result_t lisp_int_gt(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
+                            bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
@@ -164,7 +173,8 @@ static result_t lisp_int_gt(object_t *func, env_t *env, object_t *args) {
     return result_success(result ? T : NIL);
 }
 
-static result_t lisp_int_le(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
+                            bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);
@@ -186,7 +196,8 @@ static result_t lisp_int_le(object_t *func, env_t *env, object_t *args) {
     return result_success(result ? T : NIL);
 }
 
-static result_t lisp_int_ge(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_int_ge(object_t *func, object_t *args, env_t *env,
+                            bool *dirty) {
     read_args(list, args, env);
     args_eval_all(list, env);
     ensure_args_at_least(list, 1);

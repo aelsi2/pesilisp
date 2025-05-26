@@ -10,7 +10,7 @@ typedef struct {
     char *name;
 } symbol_t;
 
-static result_t symbol_eval(object_t *obj, env_t *env) {
+static result_t symbol_eval(object_t *obj, env_t *env, bool *dirty) {
     symbol_t *sym = (symbol_t *)obj;
     if (!env_is_defined(env, sym->name)) {
         return result_error(NULL);

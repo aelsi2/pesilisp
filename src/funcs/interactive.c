@@ -17,7 +17,9 @@ const char *help_message = "\n"
                            "  HELP\n"
                            "\n";
 
-static result_t lisp_help(object_t *func, env_t *env, object_t *args) {
+static result_t lisp_help(object_t *func, object_t *args, env_t *env,
+                          bool *dirty) {
+    *dirty = true;
     fprintf(stdout, "%s", help_message);
     return result_success(NIL);
 }

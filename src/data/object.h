@@ -47,7 +47,7 @@ const obj_type_t *obj_get_type(const object_t *object);
 bool obj_of_type(const object_t *object, const obj_type_t *type);
 
 // Evaluates the LISP object and returns a new object or an error.
-result_t obj_eval(object_t *object, env_t *env);
+result_t obj_eval(object_t *object, env_t *env, bool *dirty);
 
 // Prints the LISP object to the file.
 void obj_print(const object_t *object, FILE *file);

@@ -24,7 +24,7 @@ void obj_free_default(object_t *object) {
     free(object);
 }
 
-result_t obj_eval_self(object_t *object, env_t *env) {
+result_t obj_eval_self(object_t *object, env_t *env, bool *dirty) {
     return result_success(obj_ref(object));
 }
 
