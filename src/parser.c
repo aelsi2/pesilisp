@@ -8,21 +8,84 @@
 #include <stdlib.h>
 #include <string.h>
 
-static result_t parse_object(const char **str);
+#define CHAR_UNINIT (-1)
+#define CHAR_EOF (-2)
 
-static char peek(const char **str) {
-    return **str;
+struct parser_s {
+    FILE *file;
+    char *file_name;
+    int current_value;
+    int line;
+    int column;
+};
+
+parser_t *parser_new(FILE *file, const char* file_name) {
+    parser_t *parser = malloc(sizeof(parser_t));
+    parser->file = file;
+    parser->line = 0;
+    parser->column = 0;
+    parser->current_value = CHAR_UNINIT;
+    if (file_name) {
+        parser->file_name = malloc(strlen(file_name) + 1);
+        strcpy(parser->file_name, file_name);
+    } else {
+        parser->file_name = NULL;
+    }
+    return parser;
 }
 
-static char consume(const char **str) {
-    return *((*str)++);
+void parser_free(parser_t *parser) {
+    free(parser->file_name);
+    free(parser);
 }
 
-static void skip_whitespace(const char **str) {
-    while (isspace(**str)) {
-        *str += 1;
+static int parser_read_char(parser_t *parser) {
+    int value = fgetc(parser->file);
+    return value == EOF ? CHAR_EOF : value;
+}
+
+static int parser_peek(parser_t *parser) {
+    if (parser->current_value == CHAR_UNINIT) {
+        parser->current_value = parser_read_char(parser);
+    }
+    return parser->current_value;
+}
+
+static int parser_consume(parser_t *parser) {
+    if (parser->current_value == CHAR_UNINIT) {
+        parser->current_value = parser_read_char(parser);
+    }
+    int value = parser->current_value;
+    if (value == '\n') {
+        parser->line++;
+        parser->column = 0;
+    } else {
+        parser->column++;
+    }
+    parser->current_value = parser_read_char(parser);
+    return value;
+}
+
+static void parser_move_to_next(parser_t *parser) {
+    while (true) {
+        int ch = parser_peek(parser);
+        if (ch == ';') {
+            parser_consume(parser);
+            do {
+                ch = parser_consume(parser);
+            } while (ch != '\n' && ch != EOF);
+        } else if (isspace(ch)) {
+            do {
+                parser_consume(parser);
+                ch = parser_peek(parser);
+            } while (isspace(ch) && ch != EOF);
+        } else {
+            break;
+        }
     }
 }
+
+static result_t parser_parse_object(parser_t *parser);
 
 static bool isatom(char ch) {
     if (isspace(ch)) {
@@ -62,12 +125,12 @@ static bool try_parse_int(const char *str, intval_t *result) {
     return index != 0;
 }
 
-static result_t parse_atom(const char **str) {
+static result_t parser_parse_atom(parser_t *parser) {
     size_t capacity = 16;
     size_t count = 0;
     char *name = malloc(capacity);
-    while (isatom(peek(str))) {
-        name[count++] = toupper(consume(str));
+    while (isatom(parser_peek(parser))) {
+        name[count++] = toupper(parser_consume(parser));
         if (count == capacity - 1) {
             capacity *= 2;
             name = realloc(name, capacity);
@@ -90,35 +153,36 @@ static result_t parse_atom(const char **str) {
     return result_success(object);
 }
 
-static result_t parse_list_tail(const char **str) {
-    result_t car_res = parse_object(str);
+static result_t parser_parse_list_tail(parser_t *parser) {
+    result_t car_res = parser_parse_object(parser);
     if (result_is_error(&car_res)) {
         return car_res;
     }
     object_t *car = car_res.object;
     object_t *cdr;
-    skip_whitespace(str);
-    char ch = peek(str);
+    parser_move_to_next(parser);
+    char ch = parser_peek(parser);
     if (ch == '.') {
-        consume(str);
-        result_t cdr_res = parse_object(str);
+        parser_consume(parser);
+        parser_move_to_next(parser);
+        result_t cdr_res = parser_parse_object(parser);
         if (result_is_error(&cdr_res)) {
             obj_unref(car);
             return cdr_res;
         }
         cdr = cdr_res.object;
-        skip_whitespace(str);
-        if (peek(str) != ')') {
+        parser_move_to_next(parser);
+        if (parser_peek(parser) != ')') {
             obj_unref(car);
             obj_unref(cdr);
             return result_error(NULL);
         }
-        consume(str);
+        parser_consume(parser);
     } else if (ch == ')') {
-        consume(str);
+        parser_consume(parser);
         cdr = NIL;
     } else {
-        result_t cdr_res = parse_list_tail(str);
+        result_t cdr_res = parser_parse_list_tail(parser);
         if (result_is_error(&cdr_res)) {
             obj_unref(car);
             return cdr_res;
@@ -131,21 +195,21 @@ static result_t parse_list_tail(const char **str) {
     return result_success(cons);
 }
 
-static result_t parse_list(const char **str) {
-    consume(str);
-    skip_whitespace(str);
-    char ch = peek(str);
+static result_t parser_parse_list(parser_t *parser) {
+    parser_consume(parser);
+    parser_move_to_next(parser);
+    char ch = parser_peek(parser);
     if (ch == ')') {
-        consume(str);
+        parser_consume(parser);
         return result_success(NIL);
     }
-    return parse_list_tail(str);
+    return parser_parse_list_tail(parser);
 }
 
-static result_t parse_quote(const char **str) {
-    consume(str);
-    skip_whitespace(str);
-    result_t result = parse_object(str);
+static result_t parser_parse_quote(parser_t *parser) {
+    parser_consume(parser);
+    parser_move_to_next(parser);
+    result_t result = parser_parse_object(parser);
     if (result_is_error(&result)) {
         return result;
     }
@@ -158,20 +222,25 @@ static result_t parse_quote(const char **str) {
     return result_success(cons_outer);
 }
 
-static result_t parse_object(const char **str) {
-    skip_whitespace(str);
-    char ch = peek(str);
+static result_t parser_parse_object(parser_t *parser) {
+    char ch = parser_peek(parser);
     if (ch == '(') {
-        return parse_list(str);
+        return parser_parse_list(parser);
     } else if (ch == '\'') {
-        return parse_quote(str);
+        return parser_parse_quote(parser);
     } else if (isatom(ch)) {
-        return parse_atom(str);
+        return parser_parse_atom(parser);
     } else {
         return result_error(NULL);
     }
 }
 
-result_t parse(const char *str) {
-    return parse_object(&str);
+bool parser_read_object(parser_t *parser, result_t *result) {
+    parser_move_to_next(parser);
+    if (parser_peek(parser) == CHAR_EOF) {
+        return false;
+    }
+    *result = parser_parse_object(parser);
+    return true;
 }
+

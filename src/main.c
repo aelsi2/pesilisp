@@ -8,35 +8,42 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+const char *start_message =
+    "Welcome to PesiLISP!\n"
+    "Type (help) to list the standard functions or (quit) to leave.\n";
+const char *exit_message = "Bye.\n";
+
 int main() {
     int result = 0;
-    
+
     env_t *env = env_new(NULL);
     env_load_base(env);
     env_load_arithmetic(env);
     env_load_boolean(env);
     env_load_list(env);
 
-    fprintf(stdout, "Welcome to PesiLISP\nType (help) to list the standard functions or (quit) to leave.\n");
-    char *buffer = NULL;
-    size_t size;
+    parser_t *parser = parser_new(stdin, "stdin");
+
+    fprintf(stdout, "%s", start_message);
+
+    int prompt_number = 0;
     while (true) {
-        fprintf(stdout, ">> ");
-        getline(&buffer, &size, stdin);
-        if (feof(stdin)) {
+        fprintf(stdout, "[%d]> ", ++prompt_number);
+
+        result_t parse_result;
+        if (!parser_read_object(parser, &parse_result)) {
             fprintf(stdout, "\n");
             break;
         }
-        result_t parse_result = parse(buffer);
         if (result_is_error(&parse_result)) {
             error_t *error = parse_result.error;
             error_print(error, stderr);
             error_free(error);
             continue;
         }
+
         result_t eval_result = obj_eval(parse_result.object, env);
         obj_unref(parse_result.object);
-
         if (result_is_error(&eval_result)) {
             error_t *error = eval_result.error;
             if (error && error->type == ERROR_EXIT) {
@@ -53,8 +60,8 @@ int main() {
         fputc('\n', stdout);
         obj_unref(eval_result.object);
     }
-    free(buffer);
-    env_free(env);
+    fprintf(stdout, "%s", exit_message);
 
+    env_free(env);
     return result;
 }
