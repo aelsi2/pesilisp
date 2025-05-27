@@ -3,22 +3,29 @@
 #include "modules.h"
 
 const char *help_message = "\n"
-                           "Common functions:\n"
-                           "  QUOTE, NULL, EXIT (QUIT)\n"
+                           "Common:\n"
+                           "  QUOTE, NULL, EQ, LET, LET*\n"
+                           "Flow control:\n"
+                           "  IF, COND, EXIT (QUIT)\n"
                            "Integer arithmetic:\n"
                            "  +, -, *, /, MOD, REM,\n"
                            "  =, <, >, <=, >=\n"
                            "Boolean algebra:\n"
-                           "  IF, AND, OR, NOT\n"
+                           "  AND, OR, NOT\n"
                            "List processing:\n"
                            "  CONS, LIST,\n"
                            "  CAR (FIRST), CDR (REST)\n"
+                           "Function definition:\n"
+                           "  DEFUN, LAMBDA\n"
                            "Interactive:\n"
                            "  HELP\n"
                            "\n";
 
 static result_t lisp_help(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
+    read_args(list, args);
+    ensure_args_exactly(func, list, 0);
+    free_args(list);
     *dirty = true;
     fprintf(stdout, "%s", help_message);
     return result_success(NIL);
