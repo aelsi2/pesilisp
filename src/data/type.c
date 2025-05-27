@@ -2,16 +2,6 @@
 #include "data/object.h"
 #include <stdlib.h>
 
-bool type_subtype_of(const obj_type_t *type, const obj_type_t *super) {
-    while (type != NULL) {
-        if (type == super) {
-            return true;
-        }
-        type = type->base;
-    }
-    return false;
-}
-
 void *obj_alloc_default(const obj_type_t *const type, bool is_mutable) {
     object_t *object = calloc(1, type->size);
     object->type = type;

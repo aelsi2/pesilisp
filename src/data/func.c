@@ -4,14 +4,22 @@
 #include "data/object.h"
 #include "data/primitives.h"
 #include "environment.h"
+#include "func_utils.h"
 #include "type.h"
 #include <stdlib.h>
 #include <string.h>
 
 typedef struct {
     object_t base;
+    char *name;
     lisp_callback_t *callback;
 } func_t;
+
+void func_free(object_t *obj) {
+    func_t *func = (func_t *)obj;
+    free(func->name);
+    obj_free_default(obj);
+}
 
 const obj_type_t TYPE_FUNC = (obj_type_t){
     .name = "FUNC",
@@ -21,12 +29,11 @@ const obj_type_t TYPE_FUNC = (obj_type_t){
     .print = obj_print_default,
     .hash = obj_hash_default,
     .equals = obj_equals_default,
-    .free = obj_free_default,
+    .free = func_free,
 };
 
 typedef struct {
     func_t base;
-    char *name;
     int arg_count;
     char **args;
     env_t *captured_env;
@@ -40,7 +47,7 @@ static void lisp_func_free(object_t *obj) {
         free(func->args[i]);
     }
     free(func->args);
-    free(func->name);
+    free(func->base.name);
     cache_free(func->cache);
     env_free(func->captured_env);
     obj_unref(func->value);
@@ -58,9 +65,23 @@ static const obj_type_t TYPE_LISP_FUNC = (obj_type_t){
     .free = lisp_func_free,
 };
 
-object_t *obj_make_native_func(lisp_callback_t *callback) {
+const char *obj_func_name(object_t *object) {
+    if (!obj_is_func(object)) {
+        return NULL;
+    }
+    func_t *func = (func_t *)object;
+    return func->name;
+}
+
+object_t *obj_make_native_func(const char *name, lisp_callback_t *callback) {
     func_t *func = obj_alloc_default(&TYPE_FUNC, false);
     func->callback = callback;
+    if (name != NULL) {
+        func->name = malloc(strlen(name) + 1);
+        strcpy(func->name, name);
+    } else {
+        func->name = NULL;
+    }
     return (object_t *)func;
 }
 
@@ -77,19 +98,13 @@ static bool should_cache_result(object_t *result) {
     return !obj_is_mutable(result);
 }
 
-static result_t lisp_func_call(object_t *object, object_t *args, env_t *env, bool *dirty) {
+static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
+                               bool *dirty) {
     lisp_func_t *func = (lisp_func_t *)object;
 
-    obj_list_t list = obj_flatten(args);
-    if (list.count != func->arg_count) {
-        obj_list_free(&list);
-        return result_error(NULL);
-    }
-    error_t *error;
-    if (!obj_list_eval_all(&list, env, dirty, &error)) {
-        obj_list_free(&list);
-        return result_error(error);
-    }
+    read_args(list, args);
+    ensure_args_exactly(func, list, func->arg_count);
+    args_eval_all(list, env, dirty);
 
     bool args_cache = should_cache_args(&list);
     object_t *cached_result = NIL;
@@ -102,8 +117,8 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env, boo
     for (int i = 0; i < func->arg_count; i++) {
         env_define(exec_env, func->args[i], list.array[i]);
     }
-    if (func->name != NULL) {
-        env_define(exec_env, func->name, object);
+    if (func->base.name != NULL) {
+        env_define(exec_env, func->base.name, object);
     }
 
     bool result_dirty = false;
@@ -126,10 +141,10 @@ object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
     lisp_func_t *func = obj_alloc_default(&TYPE_LISP_FUNC, true);
 
     if (name != NULL) {
-        func->name = malloc(strlen(name) + 1);
-        strcpy(func->name, name);
+        func->base.name = malloc(strlen(name) + 1);
+        strcpy(func->base.name, name);
     } else {
-        func->name = NULL;
+        func->base.name = NULL;
     }
     func->captured_env = env_capture(environment);
     func->value = obj_ref(value);
@@ -149,7 +164,7 @@ object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
 result_t obj_call_func(object_t *object, object_t *args, env_t *env,
                        bool *dirty) {
     if (!obj_is_func(object)) {
-        return result_error(NULL);
+        return result_success(NIL);
     }
     func_t *func = (func_t *)object;
     return func->callback(object, args, env, dirty);

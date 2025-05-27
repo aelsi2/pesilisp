@@ -24,7 +24,6 @@ struct object_s {
     int ref_count;
 };
 
-bool type_subtype_of(const obj_type_t* type, const obj_type_t* super);
 
 void *obj_alloc_default(const obj_type_t *const type, bool is_ref_safe);
 

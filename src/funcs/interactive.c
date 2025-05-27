@@ -1,6 +1,6 @@
+#include "data/object.h"
+#include "func_utils.h"
 #include "modules.h"
-#include "object.h"
-#include "utils.h"
 
 const char *help_message = "\n"
                            "Common functions:\n"

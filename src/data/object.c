@@ -1,6 +1,6 @@
 #include "object.h"
-#include "type.h"
 #include "primitives.h"
+#include "type.h"
 
 bool obj_is_mutable(const object_t *object) {
     return object->is_mutable;
@@ -12,6 +12,20 @@ const obj_type_t *obj_get_type(const object_t *object) {
 
 bool obj_of_type(const object_t *object, const obj_type_t *type) {
     return type_subtype_of(object->type, type);
+}
+
+bool type_subtype_of(const obj_type_t *type, const obj_type_t *super) {
+    while (type != NULL) {
+        if (type == super) {
+            return true;
+        }
+        type = type->base;
+    }
+    return false;
+}
+
+const char *type_get_name(const obj_type_t *type) {
+    return type->name;
 }
 
 result_t obj_eval(object_t *object, env_t *env, bool *dirty) {
@@ -45,4 +59,3 @@ object_t *obj_unref(object_t *object) {
     }
     return NIL;
 }
-

@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+static const char *error_format_undef_var = "Undefined variable: '%s'.";
+
+static error_t *error_undef_var(const char *name) {
+    return error_runtime(NULL, error_format_undef_var, name);
+}
+
 typedef struct {
     object_t base;
     char *name;
@@ -13,7 +19,7 @@ typedef struct {
 static result_t symbol_eval(object_t *obj, env_t *env, bool *dirty) {
     symbol_t *sym = (symbol_t *)obj;
     if (!env_is_defined(env, sym->name)) {
-        return result_error(NULL);
+        return result_error(error_undef_var(sym->name));
     }
     return result_success(env_get(env, sym->name));
 }

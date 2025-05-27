@@ -1,11 +1,12 @@
 #include "data/cons.h"
+#include "func_utils.h"
 #include "modules.h"
 #include "utils.h"
 
 static result_t lisp_cons(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
-    read_args(list, args, env);
-    ensure_args_exactly(list, 2);
+    read_args(list, args);
+    ensure_args_exactly(func, list, 2);
     args_eval_all(list, env, dirty);
 
     object_t *result = obj_cons(list.array[0], list.array[1]);
@@ -16,14 +17,11 @@ static result_t lisp_cons(object_t *func, object_t *args, env_t *env,
 
 static result_t lisp_car(object_t *func, object_t *args, env_t *env,
                          bool *dirty) {
-    read_args(list, args, env);
-    ensure_args_exactly(list, 1);
+    read_args(list, args);
+    ensure_args_exactly(func, list, 1);
     args_eval_all(list, env, dirty);
+    ensure_list(func, list, 0);
 
-    if (!obj_is_list(list.array[0])) {
-        free_args(list);
-        return result_error(NULL);
-    }
     object_t *result = obj_car(list.array[0]);
     free_args(list);
 
@@ -32,14 +30,11 @@ static result_t lisp_car(object_t *func, object_t *args, env_t *env,
 
 static result_t lisp_cdr(object_t *func, object_t *args, env_t *env,
                          bool *dirty) {
-    read_args(list, args, env);
-    ensure_args_exactly(list, 1);
+    read_args(list, args);
+    ensure_args_exactly(func, list, 1);
     args_eval_all(list, env, dirty);
+    ensure_list(func, list, 0);
 
-    if (!obj_is_list(list.array[0])) {
-        free_args(list);
-        return result_error(NULL);
-    }
     object_t *result = obj_cdr(list.array[0]);
     free_args(list);
 
@@ -48,7 +43,7 @@ static result_t lisp_cdr(object_t *func, object_t *args, env_t *env,
 
 static result_t lisp_list(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
-    read_args(list, args, env);
+    read_args(list, args);
     args_eval_all(list, env, dirty);
     object_t *result = obj_list_unflatten(&list);
     free_args(list);

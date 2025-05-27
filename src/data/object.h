@@ -46,6 +46,10 @@ const obj_type_t *obj_get_type(const object_t *object);
 // Checks if the LISP object is of the specified type.
 bool obj_of_type(const object_t *object, const obj_type_t *type);
 
+bool type_subtype_of(const obj_type_t* type, const obj_type_t* super);
+
+const char *type_get_name(const obj_type_t* type);
+
 // Evaluates the LISP object and returns a new object or an error.
 result_t obj_eval(object_t *object, env_t *env, bool *dirty);
 

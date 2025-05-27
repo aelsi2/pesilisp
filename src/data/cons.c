@@ -4,6 +4,13 @@
 #include "data/primitives.h"
 #include "data/type.h"
 
+static const char *error_format_not_func =
+    "The first element of a CONS-form must evaluate to a function. Got an instance of %s instead.";
+
+static error_t *error_not_func(const char* type_name) {
+    return error_usage(NULL, error_format_not_func, type_name);
+}
+
 typedef struct {
     object_t base;
     object_t *car;
@@ -17,6 +24,12 @@ static result_t cons_eval(object_t *obj, env_t *env, bool *dirty) {
     result_t func_res = obj_eval(cons->car, env, dirty);
     if (result_is_error(&func_res)) {
         return func_res;
+    }
+
+    if (!obj_is_func(func_res.object)) {
+        error_t *error = error_not_func(func_res.object->type->name);
+        obj_unref(func_res.object);
+        return result_error(error);
     }
 
     result_t result = obj_call_func(func_res.object, cons->cdr, env, dirty);
