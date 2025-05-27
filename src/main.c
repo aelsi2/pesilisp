@@ -44,9 +44,9 @@ int main() {
 
         if (result_is_error(&parse_result)) {
             error_t *error = parse_result.error;
-            begin_color(stderr, COLOR_RED);
-            error_print(error, stderr);
-            end_color(stderr);
+            begin_color(stdout, COLOR_RED);
+            error_print(error, stdout);
+            end_color(stdout);
             error_free(error);
             continue;
         }
@@ -69,9 +69,9 @@ int main() {
             error_free(error);
             break;
         }
-        begin_color(stderr, COLOR_RED);
-        error_print(error, stderr);
-        end_color(stderr);
+        begin_color(stdout, COLOR_RED);
+        error_print(error, stdout);
+        end_color(stdout);
         error_free(error);
         continue;
     }
