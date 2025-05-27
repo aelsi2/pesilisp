@@ -1,5 +1,12 @@
-#include "modules.h"
+#include "error.h"
 #include "func_utils.h"
+#include "modules.h"
+
+static const char *error_format_divide_by_zero = "Division by zero.";
+
+static error_t *error_divide_by_zero() {
+    return error_runtime(NULL, error_format_divide_by_zero);
+}
 
 static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
@@ -60,13 +67,22 @@ static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
     ensure_type(func, list, 0, &TYPE_INT);
     intval_t result = obj_get_int(list.array[0]);
     if (list.count == 1) {
+        if (result == 0) {
+            free_args(list);
+            return result_error(error_divide_by_zero());
+        }
         result = 1 / result;
     }
     for (int i = 1; i < list.count; i++) {
         ensure_type(func, list, i, &TYPE_INT);
-        result /= obj_get_int(list.array[i]);
+        intval_t value = obj_get_int(list.array[i]);
+        if (value == 0) {
+            free_args(list);
+            return result_error(error_divide_by_zero());
+        }
+        result /= value;
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(obj_make_int(result));
 }
@@ -81,6 +97,10 @@ static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
     ensure_type(func, list, 1, &TYPE_INT);
     intval_t dividend = obj_get_int(list.array[0]);
     intval_t modulo = obj_get_int(list.array[1]);
+    if (modulo == 0) {
+        free_args(list);
+        return result_error(error_divide_by_zero());
+    }
     intval_t result = dividend % modulo;
     if (result > 0 != modulo > 0) {
         result += modulo;
@@ -100,6 +120,10 @@ static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
     ensure_type(func, list, 1, &TYPE_INT);
     intval_t dividend = obj_get_int(list.array[0]);
     intval_t modulo = obj_get_int(list.array[1]);
+    if (modulo == 0) {
+        free_args(list);
+        return result_error(error_divide_by_zero());
+    }
     intval_t result = dividend % modulo;
     obj_list_free(&list);
 
