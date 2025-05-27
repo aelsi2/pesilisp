@@ -31,6 +31,25 @@ struct parser_s {
     int current_value;
 };
 
+static parser_t default_parser;
+static bool default_parser_init = false;
+
+parser_t *parser_default() {
+    if (!default_parser_init) {
+        default_parser = (parser_t) {
+            .file = stdin,
+            .location = (location_t) {
+                .file_name = "stdin",
+                .line = 1,
+                .column = 1
+            },
+            .current_value = CHAR_UNINIT,
+        };
+        default_parser_init = true;
+    }
+    return &default_parser;
+}
+
 parser_t *parser_new(FILE *file, const char *file_name) {
     parser_t *parser = malloc(sizeof(parser_t));
     parser->file = file;
@@ -44,6 +63,9 @@ const location_t *parser_location(parser_t *parser) {
 }
 
 void parser_free(parser_t *parser) {
+    if (parser == &default_parser) {
+        return;
+    }
     location_free(&parser->location);
     free(parser);
 }

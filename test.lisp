@@ -11,6 +11,12 @@
     (+ (pascal (- n 1) (- k 1)) 
        (pascal (- n 1) k))))
 
+;;; Читает список длиной len из stdin
+(defun read-list (len) 
+  (if (<= len 0) () 
+    (cons (read) 
+          (read-list (- len 1)) )))
+
 'fib
 (fib 2)
 (fib 3)

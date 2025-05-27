@@ -12,5 +12,6 @@ void env_load_boolean(env_t *env);
 
 void env_load_lists(env_t *env);
 
-void env_load_interactive(env_t *env);
+void env_load_io(env_t *env);
 
+void env_load_interactive(env_t *env);

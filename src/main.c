@@ -20,12 +20,13 @@ int main() {
     env_load_arithmetic(env);
     env_load_boolean(env);
     env_load_lists(env);
+    env_load_io(env);
     env_load_interactive(env);
 
     fprintf(stdout, "%s", start_message);
 
     int line_num = 0;
-    parser_t *parser = parser_new(stdin, "stdin");
+    parser_t *parser = parser_default();
     int prompt_number = 0;
     while (true) {
         fprintf(stdout, "[%d]> ", ++prompt_number);
