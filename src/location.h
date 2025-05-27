@@ -11,7 +11,7 @@ static inline void location_next_column(location_t *loc) {
 }
 static inline void location_next_line(location_t *loc) {
     loc->line++;
-    loc->column = 0;
+    loc->column = 1;
 }
 void location_init(location_t *loc, const char *file_name, int line,
                    int column);

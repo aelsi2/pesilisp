@@ -23,8 +23,7 @@ static const char *error_format_no_dot_list_end =
 static const char *error_format_bad_char_range =
     "One or more invalid chatacters encountered.";
 
-static const char *error_format_symbol_dot_beginning =
-    "Symbol names cannot begin with a '.'";
+static const char *error_format_invalid_dot = "Dot ('.') is not allowed here.";
 
 struct parser_s {
     FILE *file;
@@ -123,24 +122,24 @@ static void parser_move_to_next(parser_t *parser) {
     }
 }
 
-static error_t *error_dot_list_end(parser_t *parser) {
-    return error_syntax(&parser->location, error_format_no_dot_list_end);
+static error_t *error_dot_list_end(const location_t *location) {
+    return error_syntax(location, error_format_no_dot_list_end);
 }
 
-static error_t *error_bad_char_range(location_t *location) {
+static error_t *error_bad_char_range(const location_t *location) {
     return error_syntax(location, error_format_bad_char_range);
 }
 
-static error_t *error_symbol_dot_beginning(parser_t *parser) {
-    return error_syntax(&parser->location, error_format_symbol_dot_beginning);
+static error_t *error_invalid_dot(const location_t *location) {
+    return error_syntax(location, error_format_invalid_dot);
 }
 
-static error_t *error_unexpected(parser_t *parser, int ch) {
+static error_t *error_unexpected(const location_t *location, int ch) {
     error_t *error;
     if (ch == EOF) {
-        error = error_syntax(&parser->location, error_format_unex_eof);
+        error = error_syntax(location, error_format_unex_eof);
     } else {
-        error = error_syntax(&parser->location, error_format_unex_char, ch);
+        error = error_syntax(location, error_format_unex_char, ch);
     }
     return error;
 }
@@ -182,10 +181,6 @@ static result_t parser_parse_atom(parser_t *parser) {
     }
     name[count] = '\0';
 
-    if (name[0] == '.') {
-        free(name);
-        return result_error(error_symbol_dot_beginning(parser));
-    }
     object_t *object;
     intval_t int_value;
     if (!strcmp(name, "T")) {
@@ -238,7 +233,7 @@ static result_t parser_parse_list_tail(parser_t *parser) {
             parser_consume(parser);
         } else {
             if (error == NULL) {
-                error = error_dot_list_end(parser);
+                error = error_dot_list_end(&parser->location);
             }
         }
     } else if (ch == ')') {
@@ -306,7 +301,11 @@ static result_t parser_parse_bad(parser_t *parser) {
 
 static result_t parser_parse_object(parser_t *parser) {
     char ch = parser_peek(parser);
-    if (ch == '(') {
+    if (ch == '.') {
+        error_t *error = error_invalid_dot(&parser->location);
+        parser_consume(parser);
+        return result_error(error);
+    } else if (ch == '(') {
         return parser_parse_list(parser);
     } else if (ch == '\'') {
         return parser_parse_quote(parser);
@@ -315,8 +314,9 @@ static result_t parser_parse_object(parser_t *parser) {
     } else if (isbad(ch)) {
         return parser_parse_bad(parser);
     } else {
+        error_t *error = error_unexpected(&parser->location, ch);
         parser_consume(parser);
-        return result_error(error_unexpected(parser, ch));
+        return result_error(error);
     }
 }
 
