@@ -17,24 +17,22 @@
     (cons (read) 
           (read-list (- len 1)) )))
 
-'fib
-(fib 2)
-(fib 3)
-(fib 4)
-(fib 5)
-(fib 6)
-(fib 7)
+(print 'fib)
+(print (fib 2))
+(print (fib 3))
+(print (fib 4))
+(print (fib 5))
+(print (fib 6))
+(print (fib 7))
 
-'pascal
-(pascal 4 0)
-(pascal 4 1)
-(pascal 4 2)
-(pascal 4 3)
-(pascal 4 4)
+(print 'pascal)
+(print (pascal 4 0))
+(print (pascal 4 1))
+(print (pascal 4 2))
+(print (pascal 4 3))
+(print (pascal 4 4))
 
-'fib
-(fib 1000)
-'pascal
-(pascal 1000 500)
-(pascal 800 500)
-
+(print 'large-nums)
+(print (fib 1000))
+(print (pascal 1000 500))
+(print (pascal 800 500))
