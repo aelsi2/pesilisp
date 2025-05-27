@@ -1,7 +1,7 @@
 #include "data/environment.h"
 #include "data/object.h"
-#include "funcs/modules.h"
 #include "parser.h"
+#include "stdlib/modules.h"
 #include "tty.h"
 #include <stdio.h>
 #include <stdlib.h>

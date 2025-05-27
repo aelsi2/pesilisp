@@ -34,19 +34,6 @@ object_t *obj_list_unflatten(obj_list_t *list) {
     return result;
 }
 
-bool obj_list_eval_all(obj_list_t *list, env_t *env, bool *dirty, error_t **error) {
-    for (int i = 0; i < list->count; i++) {
-        result_t eval_res = obj_eval(list->array[i], env, dirty);
-        if (result_is_error(&eval_res)) {
-            *error = eval_res.error;
-            return false;
-        }
-        obj_unref(list->array[i]);
-        list->array[i] = eval_res.object;
-    }
-    return true;
-}
-
 void obj_list_copy(obj_list_t *dst, const obj_list_t *src) {
     dst->count = src->count;
     dst->array = malloc(sizeof(object_t *) * (dst->count + 1));

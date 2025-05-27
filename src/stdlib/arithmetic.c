@@ -18,7 +18,7 @@ static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
         ensure_type(func, list, i, &TYPE_INT);
         result += obj_get_int(list.array[i]);
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(obj_make_int(result));
 }
@@ -38,7 +38,7 @@ static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
         ensure_type(func, list, i, &TYPE_INT);
         result -= obj_get_int(list.array[i]);
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(obj_make_int(result));
 }
@@ -53,7 +53,7 @@ static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
         ensure_type(func, list, i, &TYPE_INT);
         result *= obj_get_int(list.array[i]);
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(obj_make_int(result));
 }
@@ -105,7 +105,7 @@ static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
     if (result > 0 != modulo > 0) {
         result += modulo;
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(obj_make_int(result));
 }
@@ -125,7 +125,7 @@ static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
         return result_error(error_divide_by_zero());
     }
     intval_t result = dividend % modulo;
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(obj_make_int(result));
 }
@@ -146,7 +146,7 @@ static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
             break;
         }
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(result ? T : NIL);
 }
@@ -169,7 +169,7 @@ static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(result ? T : NIL);
 }
@@ -192,7 +192,7 @@ static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(result ? T : NIL);
 }
@@ -215,7 +215,7 @@ static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(result ? T : NIL);
 }
@@ -238,21 +238,21 @@ static result_t lisp_int_ge(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    obj_list_free(&list);
+    free_args(list);
 
     return result_success(result ? T : NIL);
 }
 
 void env_load_arithmetic(env_t *env) {
-    env_register(env, "+", lisp_int_add);
-    env_register(env, "-", lisp_int_sub);
-    env_register(env, "*", lisp_int_mul);
-    env_register(env, "/", lisp_int_div);
-    env_register(env, "MOD", lisp_int_mod);
-    env_register(env, "REM", lisp_int_rem);
-    env_register(env, "=", lisp_int_eq);
-    env_register(env, "<", lisp_int_lt);
-    env_register(env, ">", lisp_int_gt);
-    env_register(env, "<=", lisp_int_le);
-    env_register(env, ">=", lisp_int_ge);
+    env_register_func(env, "+", lisp_int_add);
+    env_register_func(env, "-", lisp_int_sub);
+    env_register_func(env, "*", lisp_int_mul);
+    env_register_func(env, "/", lisp_int_div);
+    env_register_func(env, "MOD", lisp_int_mod);
+    env_register_func(env, "REM", lisp_int_rem);
+    env_register_func(env, "=", lisp_int_eq);
+    env_register_func(env, "<", lisp_int_lt);
+    env_register_func(env, ">", lisp_int_gt);
+    env_register_func(env, "<=", lisp_int_le);
+    env_register_func(env, ">=", lisp_int_ge);
 }

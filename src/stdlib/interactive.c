@@ -25,5 +25,5 @@ static result_t lisp_help(object_t *func, object_t *args, env_t *env,
 }
 
 void env_load_interactive(env_t *env) {
-    env_register(env, "HELP", lisp_help);
+    env_register_func(env, "HELP", lisp_help);
 }

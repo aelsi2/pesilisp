@@ -94,6 +94,6 @@ static result_t lisp_lambda(object_t *func, object_t *args, env_t *env,
 }
 
 void env_load_funcdef(env_t *env) {
-    env_register(env, "DEFUN", lisp_defun);
-    env_register(env, "LAMBDA", lisp_lambda);
+    env_register_func(env, "DEFUN", lisp_defun);
+    env_register_func(env, "LAMBDA", lisp_lambda);
 }

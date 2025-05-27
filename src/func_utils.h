@@ -3,6 +3,7 @@
 #include "data/environment.h"
 #include "data/func.h"
 #include "data/list.h"
+#include "data/object.h"
 #include "data/primitives.h"
 #include <limits.h>
 
@@ -95,7 +96,7 @@
         return result_error(error);                                            \
     } while (0)
 
-#define env_register(env, name, func)                                          \
+#define env_register_func(env, name, func)                                          \
     do {                                                                       \
         object_t *func_obj = obj_make_native_func(name, func);                 \
         env_define(env, name, func_obj);                                       \

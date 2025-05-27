@@ -52,10 +52,10 @@ static result_t lisp_list(object_t *func, object_t *args, env_t *env,
 }
 
 void env_load_lists(env_t *env) {
-    env_register(env, "CONS", lisp_cons);
-    env_register(env, "CAR", lisp_car);
-    env_register(env, "CDR", lisp_cdr);
-    env_register(env, "FIRST", lisp_car);
-    env_register(env, "REST", lisp_cdr);
-    env_register(env, "LIST", lisp_list);
+    env_register_func(env, "CONS", lisp_cons);
+    env_register_func(env, "CAR", lisp_car);
+    env_register_func(env, "CDR", lisp_cdr);
+    env_register_func(env, "FIRST", lisp_car);
+    env_register_func(env, "REST", lisp_cdr);
+    env_register_func(env, "LIST", lisp_list);
 }
