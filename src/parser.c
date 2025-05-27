@@ -100,7 +100,7 @@ static bool isstart(int ch) {
 }
 
 static bool isbad(int ch) {
-    return !isspace(ch) && !isgraph(ch);
+    return !isspace(ch) && !isgraph(ch) && ch != CHAR_EOF;
 }
 
 static void parser_move_to_next(parser_t *parser) {
@@ -110,12 +110,12 @@ static void parser_move_to_next(parser_t *parser) {
             parser_consume(parser);
             do {
                 ch = parser_consume(parser);
-            } while (ch != '\n' && ch != EOF);
+            } while (ch != '\n' && ch != CHAR_EOF);
         } else if (isspace(ch)) {
             do {
                 parser_consume(parser);
                 ch = parser_peek(parser);
-            } while (isspace(ch) && ch != EOF);
+            } while (isspace(ch) && ch != CHAR_EOF);
         } else {
             break;
         }
@@ -136,7 +136,7 @@ static error_t *error_invalid_dot(const location_t *location) {
 
 static error_t *error_unexpected(const location_t *location, int ch) {
     error_t *error;
-    if (ch == EOF) {
+    if (ch == CHAR_EOF) {
         error = error_syntax(location, error_format_unex_eof);
     } else {
         error = error_syntax(location, error_format_unex_char, ch);
@@ -212,7 +212,7 @@ static result_t parser_parse_list_tail(parser_t *parser) {
     }
 
     parser_move_to_next(parser);
-    char ch = parser_peek(parser);
+    int ch = parser_peek(parser);
     if (ch == '.') {
         parser_consume(parser);
         parser_move_to_next(parser);
@@ -239,6 +239,10 @@ static result_t parser_parse_list_tail(parser_t *parser) {
     } else if (ch == ')') {
         parser_consume(parser);
         cdr = NIL;
+    } else if (ch == CHAR_EOF) {
+        if (error == NULL) {
+            error = error_unexpected(&parser->location, ch);
+        }
     } else {
         result_t cdr_res = parser_parse_list_tail(parser);
         if (result_is_error(&cdr_res)) {
@@ -266,7 +270,7 @@ static result_t parser_parse_list_tail(parser_t *parser) {
 static result_t parser_parse_list(parser_t *parser) {
     parser_consume(parser);
     parser_move_to_next(parser);
-    char ch = parser_peek(parser);
+    int ch = parser_peek(parser);
     if (ch == ')') {
         parser_consume(parser);
         return result_success(NIL);
@@ -300,7 +304,7 @@ static result_t parser_parse_bad(parser_t *parser) {
 }
 
 static result_t parser_parse_object(parser_t *parser) {
-    char ch = parser_peek(parser);
+    int ch = parser_peek(parser);
     if (ch == '.') {
         error_t *error = error_invalid_dot(&parser->location);
         parser_consume(parser);
