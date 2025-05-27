@@ -2,6 +2,7 @@
 #include "data/object.h"
 #include "funcs/modules.h"
 #include "parser.h"
+#include "tty.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,10 +22,10 @@ int main() {
     env_load_lists(env);
     env_load_interactive(env);
 
-    parser_t *parser = parser_new(stdin, "stdin");
-
     fprintf(stdout, "%s", start_message);
 
+    int line_num = 0;
+    parser_t *parser = parser_new(stdin, "stdin");
     int prompt_number = 0;
     while (true) {
         fprintf(stdout, "[%d]> ", ++prompt_number);
@@ -34,9 +35,18 @@ int main() {
             fputc('\n', stdout);
             break;
         }
+
+        const location_t *location = parser_location(parser);
+        if (line_num == location->line) {
+            fputc('\n', stdout);
+        }
+        line_num = location->line;
+
         if (result_is_error(&parse_result)) {
             error_t *error = parse_result.error;
+            begin_color(stderr, COLOR_RED);
             error_print(error, stderr);
+            end_color(stderr);
             error_free(error);
             continue;
         }
@@ -45,7 +55,9 @@ int main() {
         result_t eval_result = obj_eval(parse_result.object, env, &dirty);
         obj_unref(parse_result.object);
         if (!result_is_error(&eval_result)) {
+            begin_color(stdout, COLOR_BLUE);
             obj_print(eval_result.object, stdout);
+            end_color(stdout);
             fputc('\n', stdout);
             obj_unref(eval_result.object);
             continue;
@@ -57,7 +69,9 @@ int main() {
             error_free(error);
             break;
         }
+        begin_color(stderr, COLOR_RED);
         error_print(error, stderr);
+        end_color(stderr);
         error_free(error);
         continue;
     }
