@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define CHAR_UNINIT (-1)
-#define CHAR_EOF (-2)
+#define CHAR_UNINIT (-128)
+#define CHAR_EOF (-129)
 
 struct parser_s {
     FILE *file;
@@ -19,7 +19,7 @@ struct parser_s {
     int column;
 };
 
-parser_t *parser_new(FILE *file, const char* file_name) {
+parser_t *parser_new(FILE *file, const char *file_name) {
     parser_t *parser = malloc(sizeof(parser_t));
     parser->file = file;
     parser->line = 0;
@@ -87,18 +87,21 @@ static void parser_move_to_next(parser_t *parser) {
 
 static result_t parser_parse_object(parser_t *parser);
 
-static bool isatom(char ch) {
-    if (isspace(ch)) {
+static bool isatom(int ch) {
+    if (!isgraph(ch)) {
         return false;
     }
     switch (ch) {
     case '(':
     case ')':
     case '\'':
-    case '\0':
         return false;
     }
     return true;
+}
+
+static bool isbad(int ch) {
+    return iscntrl(ch) && !isspace(ch);
 }
 
 static bool try_parse_int(const char *str, intval_t *result) {
@@ -222,6 +225,13 @@ static result_t parser_parse_quote(parser_t *parser) {
     return result_success(cons_outer);
 }
 
+static result_t parser_parse_bad(parser_t *parser) {
+    while (isbad(parser_peek(parser))) {
+        parser_consume(parser);
+    }
+    return result_error(NULL);
+}
+
 static result_t parser_parse_object(parser_t *parser) {
     char ch = parser_peek(parser);
     if (ch == '(') {
@@ -231,7 +241,7 @@ static result_t parser_parse_object(parser_t *parser) {
     } else if (isatom(ch)) {
         return parser_parse_atom(parser);
     } else {
-        return result_error(NULL);
+        return parser_parse_bad(parser);
     }
 }
 
@@ -243,4 +253,3 @@ bool parser_read_object(parser_t *parser, result_t *result) {
     *result = parser_parse_object(parser);
     return true;
 }
-
