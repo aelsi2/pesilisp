@@ -4,6 +4,8 @@
 
 void env_load_base(env_t *env);
 
+void env_load_control(env_t *env);
+
 void env_load_funcdef(env_t *env);
 
 void env_load_arithmetic(env_t *env);

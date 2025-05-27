@@ -1,9 +1,9 @@
 ;;; Получает n-ное число Фибоначчи
 (defun fib (num) 
-  (if (= num 0) 0 
-    (if (= num 1) 1 
-      (+ (fib (- num 2)) 
-         (fib (- num 1)) ))))
+  (cond ((= num 0) 0)
+        ((= num 1) 1)
+        ((+ (fib (- num 2)) 
+            (fib (- num 1)) ))))
 
 ;;; Получает k-й элемент n-й строки треугольника Паскаля 
 (defun pascal (n k) 
@@ -17,7 +17,14 @@
     (cons (read) 
           (read-list (- len 1)) )))
 
-(print 'fib)
+(let* ((_ (print 'enter-list-length:))
+       (cnt (read))
+       (_ (print 'enter-list-elements:))
+       (lst (read-list cnt)))
+  (print 'list:)
+  (print lst))
+
+(print 'fib:)
 (print (fib 2))
 (print (fib 3))
 (print (fib 4))
@@ -25,14 +32,13 @@
 (print (fib 6))
 (print (fib 7))
 
-(print 'pascal)
+(print 'pascal:)
 (print (pascal 4 0))
 (print (pascal 4 1))
 (print (pascal 4 2))
 (print (pascal 4 3))
 (print (pascal 4 4))
 
-(print 'large-nums)
+(print 'large-nums:)
 (print (fib 1000))
 (print (pascal 1000 500))
-(print (pascal 800 500))

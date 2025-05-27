@@ -46,33 +46,9 @@ static result_t lisp_bool_not(object_t *func, object_t *args, env_t *env,
     return result_success(result);
 }
 
-static result_t lisp_if(object_t *func, object_t *args, env_t *env,
-                        bool *dirty) {
-    read_args(list, args);
-    ensure_args_between(func, list, 2, 3);
-
-    arg_eval(list, 0, env, dirty);
-    object_t *result;
-    if (obj_is_null(list.array[0])) {
-        if (list.count == 2) {
-            result = NIL;
-        } else {
-            arg_eval(list, 2, env, dirty);
-            result = obj_ref(list.array[2]);
-        }
-    } else {
-        arg_eval(list, 1, env, dirty);
-        result = obj_ref(list.array[1]);
-    }
-    free_args(list);
-
-    return result_success(result);
-}
-
 void env_load_boolean(env_t *env) {
     env_register_func(env, "OR", lisp_bool_or);
     env_register_func(env, "AND", lisp_bool_and);
     env_register_func(env, "NOT", lisp_bool_not);
     env_register_func(env, "NULL", lisp_bool_not);
-    env_register_func(env, "IF", lisp_if);
 }
