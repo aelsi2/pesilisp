@@ -7,9 +7,9 @@
 #include "data/primitives.h"
 #include <limits.h>
 
-#define read_args(list, args) obj_list_t list = obj_flatten(args)
+#define list_begin(list, args) obj_list_t list = obj_flatten(args)
 
-#define free_args(list) obj_list_free(&list)
+#define list_end(list) obj_list_free(&list)
 
 #define args_eval_all(list, env, dirty)                                        \
     do {                                                                       \
@@ -96,7 +96,7 @@
         return result_error(error);                                            \
     } while (0)
 
-#define env_register_func(env, name, func)                                          \
+#define env_register_func(env, name, func)                                     \
     do {                                                                       \
         object_t *func_obj = obj_make_native_func(name, func);                 \
         env_define(env, name, func_obj);                                       \

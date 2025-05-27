@@ -26,9 +26,9 @@ const char *help_message = "\n"
 
 static result_t lisp_help(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_exactly(func, list, 0);
-    free_args(list);
+    list_end(list);
     *dirty = true;
     fprintf(stdout, "%s", help_message);
     return result_success(NIL);

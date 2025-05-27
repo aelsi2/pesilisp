@@ -10,22 +10,22 @@ static result_t read_cond_clause(object_t *clause, env_t *env, bool *dirty,
     if (!obj_is_cons(clause)) {
         return result_error(error_usage(NULL, error_format_bad_cond_clause));
     }
-    read_args(list, clause);
+    list_begin(list, clause);
     
     if (list.count == 1) {
         result_t result = obj_eval(list.array[0], env, dirty);
-        free_args(list);
+        list_end(list);
         *match = true;
         return result;
     }
 
     result_t cond_result = obj_eval(list.array[0], env, dirty);
     if (result_is_error(&cond_result)) {
-        free_args(list);
+        list_end(list);
         return cond_result;
     }
     if (obj_is_null(cond_result.object)) {
-        free_args(list);
+        list_end(list);
         *match = false;
         return cond_result;
     }
@@ -37,19 +37,19 @@ static result_t read_cond_clause(object_t *clause, env_t *env, bool *dirty,
         obj_unref(result);
         result_t eval_res = obj_eval(list.array[i], env, dirty);
         if (result_is_error(&eval_res)) {
-            free_args(list);
+            list_end(list);
             return eval_res;
         }
         result = eval_res.object;
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_cond(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
 
     bool match = false;
     object_t *result = NIL;
@@ -57,7 +57,7 @@ static result_t lisp_cond(object_t *func, object_t *args, env_t *env,
         obj_unref(result);
         result_t eval_res = read_cond_clause(list.array[i], env, dirty, &match);
         if (result_is_error(&eval_res)) {
-            free_args(list);
+            list_end(list);
             return eval_res;
         }
         result = eval_res.object;
@@ -65,14 +65,14 @@ static result_t lisp_cond(object_t *func, object_t *args, env_t *env,
             break;
         }
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_if(object_t *func, object_t *args, env_t *env,
                         bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_between(func, list, 2, 3);
 
     arg_eval(list, 0, env, dirty);
@@ -88,14 +88,14 @@ static result_t lisp_if(object_t *func, object_t *args, env_t *env,
         arg_eval(list, 1, env, dirty);
         result = obj_ref(list.array[1]);
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_exit(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_at_most(func, list, 1);
     args_eval_all(list, env, dirty);
 
@@ -108,7 +108,7 @@ static result_t lisp_exit(object_t *func, object_t *args, env_t *env,
             exit_code = obj_is_null(arg) ? 0 : 1;
         }
     }
-    free_args(list);
+    list_end(list);
 
     return result_error(error_exit(exit_code));
 }

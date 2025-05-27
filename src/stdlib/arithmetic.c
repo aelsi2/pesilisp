@@ -10,7 +10,7 @@ static error_t *error_divide_by_zero() {
 
 static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
 
     intval_t result = 0;
@@ -18,14 +18,14 @@ static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
         ensure_type(func, list, i, &TYPE_INT);
         result += obj_get_int(list.array[i]);
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(obj_make_int(result));
 }
 
 static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_at_least(func, list, 1);
 
@@ -38,14 +38,14 @@ static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
         ensure_type(func, list, i, &TYPE_INT);
         result -= obj_get_int(list.array[i]);
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(obj_make_int(result));
 }
 
 static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
 
     intval_t result = 1;
@@ -53,14 +53,14 @@ static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
         ensure_type(func, list, i, &TYPE_INT);
         result *= obj_get_int(list.array[i]);
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(obj_make_int(result));
 }
 
 static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_at_least(func, list, 1);
 
@@ -68,7 +68,7 @@ static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
     intval_t result = obj_get_int(list.array[0]);
     if (list.count == 1) {
         if (result == 0) {
-            free_args(list);
+            list_end(list);
             return result_error(error_divide_by_zero());
         }
         result = 1 / result;
@@ -77,19 +77,19 @@ static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
         ensure_type(func, list, i, &TYPE_INT);
         intval_t value = obj_get_int(list.array[i]);
         if (value == 0) {
-            free_args(list);
+            list_end(list);
             return result_error(error_divide_by_zero());
         }
         result /= value;
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(obj_make_int(result));
 }
 
 static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_exactly(func, list, 2);
 
@@ -98,21 +98,21 @@ static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
     intval_t dividend = obj_get_int(list.array[0]);
     intval_t modulo = obj_get_int(list.array[1]);
     if (modulo == 0) {
-        free_args(list);
+        list_end(list);
         return result_error(error_divide_by_zero());
     }
     intval_t result = dividend % modulo;
     if (result > 0 != modulo > 0) {
         result += modulo;
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(obj_make_int(result));
 }
 
 static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_exactly(func, list, 2);
 
@@ -121,18 +121,18 @@ static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
     intval_t dividend = obj_get_int(list.array[0]);
     intval_t modulo = obj_get_int(list.array[1]);
     if (modulo == 0) {
-        free_args(list);
+        list_end(list);
         return result_error(error_divide_by_zero());
     }
     intval_t result = dividend % modulo;
-    free_args(list);
+    list_end(list);
 
     return result_success(obj_make_int(result));
 }
 
 static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_at_least(func, list, 1);
 
@@ -146,14 +146,14 @@ static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
             break;
         }
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result ? T : NIL);
 }
 
 static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_at_least(func, list, 1);
 
@@ -169,14 +169,14 @@ static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result ? T : NIL);
 }
 
 static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_at_least(func, list, 1);
 
@@ -192,14 +192,14 @@ static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result ? T : NIL);
 }
 
 static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_at_least(func, list, 1);
 
@@ -215,14 +215,14 @@ static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result ? T : NIL);
 }
 
 static result_t lisp_int_ge(object_t *func, object_t *args, env_t *env,
                             bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     ensure_args_at_least(func, list, 1);
 
@@ -238,7 +238,7 @@ static result_t lisp_int_ge(object_t *func, object_t *args, env_t *env,
         }
         value = new_val;
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result ? T : NIL);
 }

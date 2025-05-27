@@ -5,48 +5,48 @@
 
 static result_t lisp_cons(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_exactly(func, list, 2);
     args_eval_all(list, env, dirty);
 
     object_t *result = obj_cons(list.array[0], list.array[1]);
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_car(object_t *func, object_t *args, env_t *env,
                          bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_exactly(func, list, 1);
     args_eval_all(list, env, dirty);
     ensure_list(func, list, 0);
 
     object_t *result = obj_car(list.array[0]);
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_cdr(object_t *func, object_t *args, env_t *env,
                          bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_exactly(func, list, 1);
     args_eval_all(list, env, dirty);
     ensure_list(func, list, 0);
 
     object_t *result = obj_cdr(list.array[0]);
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_list(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     args_eval_all(list, env, dirty);
     object_t *result = obj_list_unflatten(&list);
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }

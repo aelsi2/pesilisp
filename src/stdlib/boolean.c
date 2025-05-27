@@ -3,7 +3,7 @@
 
 static result_t lisp_bool_or(object_t *func, object_t *args, env_t *env,
                              bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     object_t *result = NIL;
     for (int i = 0; i < list.count; i++) {
         arg_eval(list, i, env, dirty);
@@ -12,14 +12,14 @@ static result_t lisp_bool_or(object_t *func, object_t *args, env_t *env,
             break;
         }
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_bool_and(object_t *func, object_t *args, env_t *env,
                               bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     object_t *result = T;
     for (int i = 0; i < list.count; i++) {
         arg_eval(list, i, env, dirty);
@@ -29,19 +29,19 @@ static result_t lisp_bool_and(object_t *func, object_t *args, env_t *env,
             break;
         }
     }
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }
 
 static result_t lisp_bool_not(object_t *func, object_t *args, env_t *env,
                               bool *dirty) {
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_exactly(func, list, 1);
     args_eval_all(list, env, dirty);
 
     object_t *result = obj_is_null(list.array[0]) ? T : NIL;
-    free_args(list);
+    list_end(list);
 
     return result_success(result);
 }

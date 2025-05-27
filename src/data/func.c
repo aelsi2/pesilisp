@@ -108,7 +108,7 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
                                bool *dirty) {
     lisp_func_t *func = (lisp_func_t *)object;
 
-    read_args(list, args);
+    list_begin(list, args);
     ensure_args_exactly(func, list, func->arg_count);
     args_eval_all(list, env, dirty);
 
@@ -137,7 +137,7 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
     if (result_dirty) {
         *dirty = true;
     }
-    obj_list_free(&list);
+    list_end(list);
     env_free(exec_env);
     return result;
 }
