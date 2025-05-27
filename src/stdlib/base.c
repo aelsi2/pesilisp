@@ -131,9 +131,36 @@ static result_t lisp_quote(object_t *func, object_t *args, env_t *env,
     return result_success(result);
 }
 
+static result_t lisp_eval(object_t *func, object_t *args, env_t *env,
+                           bool *dirty) {
+    read_args(list, args);
+    ensure_args_exactly(func, list, 1);
+    arg_eval(list, 0, env, dirty);
+    arg_eval(list, 0, env, dirty);
+    object_t *result = obj_ref(list.array[0]);
+    free_args(list);
+
+    return result_success(result);
+}
+
+static result_t lisp_apply(object_t *func, object_t *args, env_t *env,
+                           bool *dirty) {
+    read_args(list, args);
+    ensure_args_exactly(func, list, 2);
+    args_eval_all(list, env, dirty);
+    ensure_type(func, list, 0, &TYPE_FUNC);
+
+    result_t result = obj_call_func(list.array[0], list.array[1], env, dirty);
+    free_args(list);
+
+    return result;
+}
+
 void env_load_base(env_t *env) {
-    env_register_func(env, "EQ", lisp_eq);
     env_register_func(env, "QUOTE", lisp_quote);
+    env_register_func(env, "EVAL", lisp_eval);
+    env_register_func(env, "APPLY", lisp_apply);
     env_register_func(env, "LET", lisp_let);
     env_register_func(env, "LET*", lisp_let_star);
+    env_register_func(env, "EQ", lisp_eq);
 }

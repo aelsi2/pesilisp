@@ -4,7 +4,8 @@
 
 const char *help_message = "\n"
                            "Common:\n"
-                           "  QUOTE, NULL, EQ, LET, LET*\n"
+                           "  QUOTE, LET, LET*,\n"
+                           "  EVAL, APPLY, NULL, EQ\n"
                            "Flow control:\n"
                            "  IF, COND, EXIT (QUIT)\n"
                            "Integer arithmetic:\n"
@@ -17,6 +18,8 @@ const char *help_message = "\n"
                            "  CAR (FIRST), CDR (REST)\n"
                            "Function definition:\n"
                            "  DEFUN, LAMBDA\n"
+                           "Input/Output:\n"
+                           "  PRINT, READ\n"
                            "Interactive:\n"
                            "  HELP\n"
                            "\n";
