@@ -2,8 +2,6 @@
 
 #include <limits.h>
 
-static const char *func_name_anon = "(lambda)";
-
 static const char *error_format_few_args_exact =
     "Not enough arguments provided to function %s.\n"
     "Got: %d. Expected: %d.";
@@ -33,9 +31,6 @@ static const char *error_format_not_list =
     "Got: %s. Expected: LIST (CONS or NULL).";
 
 error_t *error_wrong_arg_count(const char *name, int min, int max, int actual) {
-    if (!name) {
-        name = func_name_anon;
-    }
     if (max == INT_MAX) {
         return error_usage(NULL, error_format_few_args_min, name, actual, min);
     }

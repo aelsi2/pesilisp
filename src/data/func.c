@@ -21,12 +21,17 @@ void func_free(object_t *obj) {
     obj_free_default(obj);
 }
 
+void func_print(const object_t *obj, FILE *file) {
+    func_t *func = (func_t *)obj;
+    fprintf(file, "#<FUNCTION %s>", func->name);
+}
+
 const obj_type_t TYPE_FUNC = (obj_type_t){
-    .name = "FUNC",
+    .name = "FUNCTION",
     .base = &TYPE_T,
     .size = sizeof(func_t),
     .eval = obj_eval_self,
-    .print = obj_print_default,
+    .print = func_print,
     .hash = obj_hash_default,
     .equals = obj_equals_default,
     .free = func_free,
@@ -55,11 +60,11 @@ static void lisp_func_free(object_t *obj) {
 }
 
 static const obj_type_t TYPE_LISP_FUNC = (obj_type_t){
-    .name = "FUNC",
+    .name = "FUNCTION",
     .base = &TYPE_FUNC,
     .size = sizeof(lisp_func_t),
     .eval = obj_eval_self,
-    .print = obj_print_default,
+    .print = func_print,
     .hash = obj_hash_default,
     .equals = obj_equals_default,
     .free = lisp_func_free,
@@ -73,15 +78,16 @@ const char *obj_func_name(object_t *object) {
     return func->name;
 }
 
+static const char *func_name_default = "(anonymous)";
+
 object_t *obj_make_native_func(const char *name, lisp_callback_t *callback) {
     func_t *func = obj_alloc_default(&TYPE_FUNC, false);
     func->callback = callback;
-    if (name != NULL) {
-        func->name = malloc(strlen(name) + 1);
-        strcpy(func->name, name);
-    } else {
-        func->name = NULL;
+    if (!name) {
+        name = func_name_default;
     }
+    func->name = malloc(strlen(name) + 1);
+    strcpy(func->name, name);
     return (object_t *)func;
 }
 
@@ -140,12 +146,11 @@ object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
                              object_t *value, env_t *environment) {
     lisp_func_t *func = obj_alloc_default(&TYPE_LISP_FUNC, true);
 
-    if (name != NULL) {
-        func->base.name = malloc(strlen(name) + 1);
-        strcpy(func->base.name, name);
-    } else {
-        func->base.name = NULL;
+    if (!name) {
+        name = func_name_default;
     }
+    func->base.name = malloc(strlen(name) + 1);
+    strcpy(func->base.name, name);
     func->captured_env = env_capture(environment);
     func->value = obj_ref(value);
     func->base.callback = lisp_func_call;
