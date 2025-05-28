@@ -5,7 +5,7 @@
 static const char *error_format_nothing_to_read = "Nothing to read.";
 
 static result_t lisp_print(object_t *func, object_t *args, env_t *env,
-                           int *recursion_limit, bool *dirty) {
+                           int recursion_limit, bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 1);
     arg_eval(list, 0, env, recursion_limit, dirty);
@@ -20,7 +20,7 @@ static result_t lisp_print(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_read(object_t *func, object_t *args, env_t *env,
-                          int *recursion_limit, bool *dirty) {
+                          int recursion_limit, bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 0);
 

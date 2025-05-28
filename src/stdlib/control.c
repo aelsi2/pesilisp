@@ -6,7 +6,7 @@ static const char *error_format_bad_cond_clause =
     "Each COND clause must be a list with at least 1 element";
 
 static result_t read_cond_clause(object_t *clause, env_t *env,
-                                 int *recursion_limit, bool *dirty,
+                                 int recursion_limit, bool *dirty,
                                  bool *match) {
     if (!obj_is_cons(clause)) {
         return result_error(error_usage(NULL, error_format_bad_cond_clause));
@@ -50,7 +50,7 @@ static result_t read_cond_clause(object_t *clause, env_t *env,
 }
 
 static result_t lisp_cond(object_t *func, object_t *args, env_t *env,
-                          int *recursion_limit, bool *dirty) {
+                          int recursion_limit, bool *dirty) {
     list_begin(list, args);
 
     bool match = false;
@@ -74,7 +74,7 @@ static result_t lisp_cond(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_if(object_t *func, object_t *args, env_t *env,
-                        int *recursion_limit, bool *dirty) {
+                        int recursion_limit, bool *dirty) {
     list_begin(list, args);
     ensure_args_between(func, list, 2, 3);
 
@@ -97,7 +97,7 @@ static result_t lisp_if(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_exit(object_t *func, object_t *args, env_t *env,
-                          int *recursion_limit, bool *dirty) {
+                          int recursion_limit, bool *dirty) {
     list_begin(list, args);
     ensure_args_at_most(func, list, 1);
     args_eval_all(list, env, recursion_limit, dirty);

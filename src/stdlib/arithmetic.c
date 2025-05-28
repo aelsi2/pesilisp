@@ -9,7 +9,7 @@ static error_t *error_divide_by_zero() {
 }
 
 static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
-                             int *recursion_limit, bool *dirty) {
+                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
 
@@ -24,7 +24,7 @@ static result_t lisp_int_add(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
-                             int *recursion_limit, bool *dirty) {
+                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_at_least(func, list, 1);
@@ -44,7 +44,7 @@ static result_t lisp_int_sub(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
-                             int *recursion_limit, bool *dirty) {
+                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
 
@@ -59,7 +59,7 @@ static result_t lisp_int_mul(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
-                             int *recursion_limit, bool *dirty) {
+                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_at_least(func, list, 1);
@@ -88,7 +88,7 @@ static result_t lisp_int_div(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
-                             int *recursion_limit, bool *dirty) {
+                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_exactly(func, list, 2);
@@ -111,7 +111,7 @@ static result_t lisp_int_mod(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
-                             int *recursion_limit, bool *dirty) {
+                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_exactly(func, list, 2);
@@ -131,7 +131,7 @@ static result_t lisp_int_rem(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
-                            int *recursion_limit, bool *dirty) {
+                            int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_at_least(func, list, 1);
@@ -152,7 +152,7 @@ static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
-                            int *recursion_limit, bool *dirty) {
+                            int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_at_least(func, list, 1);
@@ -175,7 +175,7 @@ static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
-                            int *recursion_limit, bool *dirty) {
+                            int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_at_least(func, list, 1);
@@ -198,7 +198,7 @@ static result_t lisp_int_gt(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
-                            int *recursion_limit, bool *dirty) {
+                            int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_at_least(func, list, 1);
@@ -221,7 +221,7 @@ static result_t lisp_int_le(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_int_ge(object_t *func, object_t *args, env_t *env,
-                            int *recursion_limit, bool *dirty) {
+                            int recursion_limit, bool *dirty) {
     list_begin(list, args);
     args_eval_all(list, env, recursion_limit, dirty);
     ensure_args_at_least(func, list, 1);

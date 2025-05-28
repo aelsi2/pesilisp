@@ -57,7 +57,7 @@ static int run_repl(parser_t *parser, env_t *env) {
 
         bool dirty = false;
         int recursion_limit = RECURSION_LIMIT;
-        result_t eval_result = obj_eval(parse_result.object, env, &recursion_limit, &dirty);
+        result_t eval_result = obj_eval(parse_result.object, env, recursion_limit, &dirty);
         obj_unref(parse_result.object);
         if (!result_is_error(&eval_result)) {
             begin_color(stdout, COLOR_BLUE);
@@ -106,7 +106,7 @@ static int run_normal(parser_t *parser, env_t *env) {
 
         bool dirty = false;
         int recursion_limit = RECURSION_LIMIT;
-        result_t eval_result = obj_eval(parse_result.object, env, &recursion_limit, &dirty);
+        result_t eval_result = obj_eval(parse_result.object, env, recursion_limit, &dirty);
         obj_unref(parse_result.object);
 
         if (result_is_error(&eval_result)) {

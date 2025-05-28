@@ -108,10 +108,10 @@ static bool should_cache_result(object_t *result) {
 }
 
 static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
-                               int *recursion_limit, bool *dirty) {
+                               int recursion_limit, bool *dirty) {
     lisp_func_t *func = (lisp_func_t *)object;
     
-    if (*recursion_limit <= 0) {
+    if (recursion_limit <= 0) {
         error_t *error =
             error_runtime(NULL, error_format_recursion_limit, func->base.name);
         return result_error(error);
@@ -137,10 +137,8 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
     }
 
     bool result_dirty = false;
-    (*recursion_limit)--;
     result_t result =
-        obj_eval(func->value, exec_env, recursion_limit, &result_dirty);
-    (*recursion_limit)++;
+        obj_eval(func->value, exec_env, recursion_limit - 1, &result_dirty);
     bool result_cache = !result_dirty && !result_is_error(&result) &&
                         should_cache_result(result.object);
     if (args_cache && result_cache) {
@@ -179,7 +177,7 @@ object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
 }
 
 result_t obj_call_func(object_t *object, object_t *args, env_t *env,
-                       int *recursion_limit, bool *dirty) {
+                       int recursion_limit, bool *dirty) {
     if (!obj_is_func(object)) {
         return result_success(NIL);
     }

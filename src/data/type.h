@@ -11,7 +11,7 @@ struct obj_type_s {
     char *name;
     const obj_type_t *base;
     size_t size;
-    result_t (*eval)(object_t *object, env_t *env, int *recursion_limit, bool *dirty);
+    result_t (*eval)(object_t *object, env_t *env, int recursion_limit, bool *dirty);
     void (*print)(const object_t *object, FILE *file);
     hash_t (*hash)(const object_t *object);
     bool (*equals)(const object_t *object, const object_t *other);
@@ -29,7 +29,7 @@ void *obj_alloc_default(const obj_type_t *const type, bool is_ref_safe);
 
 void obj_free_default(object_t *object);
 
-result_t obj_eval_self(object_t *object, env_t *env, int *recursion_limit, bool *dirty);
+result_t obj_eval_self(object_t *object, env_t *env, int recursion_limit, bool *dirty);
 
 void obj_print_default(const object_t *object, FILE *file);
 

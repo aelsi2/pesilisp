@@ -17,7 +17,7 @@ typedef struct {
     object_t *cdr;
 } cons_t;
 
-static result_t cons_eval(object_t *obj, env_t *env, int *recursion_limit, bool *dirty) {
+static result_t cons_eval(object_t *obj, env_t *env, int recursion_limit, bool *dirty) {
     cons_t *cons = (cons_t *)obj;
     object_t *args = cons->cdr;
 

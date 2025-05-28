@@ -2,7 +2,7 @@
 #include "modules.h"
 
 static result_t lisp_bool_or(object_t *func, object_t *args, env_t *env,
-                             int *recursion_limit, bool *dirty) {
+                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
     object_t *result = NIL;
     for (int i = 0; i < list.count; i++) {
@@ -18,7 +18,7 @@ static result_t lisp_bool_or(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_bool_and(object_t *func, object_t *args, env_t *env,
-                              int *recursion_limit, bool *dirty) {
+                              int recursion_limit, bool *dirty) {
     list_begin(list, args);
     object_t *result = T;
     for (int i = 0; i < list.count; i++) {
@@ -35,7 +35,7 @@ static result_t lisp_bool_and(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_bool_not(object_t *func, object_t *args, env_t *env,
-                              int *recursion_limit, bool *dirty) {
+                              int recursion_limit, bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 1);
     args_eval_all(list, env, recursion_limit, dirty);
