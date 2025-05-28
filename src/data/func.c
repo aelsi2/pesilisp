@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+static const char *error_format_recursion_limit =
+    "Recursion limit reached while trying to evaluate function '%s'.";
+
 typedef struct {
     object_t base;
     char *name;
@@ -105,12 +108,12 @@ static bool should_cache_result(object_t *result) {
 }
 
 static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
-                               bool *dirty) {
+                               int *recursion_depth, bool *dirty) {
     lisp_func_t *func = (lisp_func_t *)object;
 
     list_begin(list, args);
     ensure_args_exactly(func, list, func->arg_count);
-    args_eval_all(list, env, dirty);
+    args_eval_all(list, env, recursion_depth, dirty);
 
     bool args_cache = should_cache_args(&list);
     object_t *cached_result = NIL;
@@ -128,7 +131,17 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
     }
 
     bool result_dirty = false;
-    result_t result = obj_eval(func->value, exec_env, &result_dirty);
+    if (*recursion_depth <= 0) {
+        list_end(list);
+        env_free(exec_env);
+        error_t *error =
+            error_runtime(NULL, error_format_recursion_limit, func->base.name);
+        return result_error(error);
+    }
+    (*recursion_depth)--;
+    result_t result =
+        obj_eval(func->value, exec_env, recursion_depth, &result_dirty);
+    (*recursion_depth)++;
     bool result_cache = !result_dirty && !result_is_error(&result) &&
                         should_cache_result(result.object);
     if (args_cache && result_cache) {
@@ -167,10 +180,10 @@ object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
 }
 
 result_t obj_call_func(object_t *object, object_t *args, env_t *env,
-                       bool *dirty) {
+                       int *recursion_depth, bool *dirty) {
     if (!obj_is_func(object)) {
         return result_success(NIL);
     }
     func_t *func = (func_t *)object;
-    return func->callback(object, args, env, dirty);
+    return func->callback(object, args, env, recursion_depth, dirty);
 }

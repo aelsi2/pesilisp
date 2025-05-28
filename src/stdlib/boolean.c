@@ -2,11 +2,11 @@
 #include "modules.h"
 
 static result_t lisp_bool_or(object_t *func, object_t *args, env_t *env,
-                             bool *dirty) {
+                             int *recursion_depth, bool *dirty) {
     list_begin(list, args);
     object_t *result = NIL;
     for (int i = 0; i < list.count; i++) {
-        arg_eval(list, i, env, dirty);
+        arg_eval(list, i, env, recursion_depth, dirty);
         if (!obj_is_null(list.array[i])) {
             result = obj_ref(list.array[i]);
             break;
@@ -18,11 +18,11 @@ static result_t lisp_bool_or(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_bool_and(object_t *func, object_t *args, env_t *env,
-                              bool *dirty) {
+                              int *recursion_depth, bool *dirty) {
     list_begin(list, args);
     object_t *result = T;
     for (int i = 0; i < list.count; i++) {
-        arg_eval(list, i, env, dirty);
+        arg_eval(list, i, env, recursion_depth, dirty);
         obj_unref(result);
         result = obj_ref(list.array[i]);
         if (obj_is_null(list.array[i])) {
@@ -35,10 +35,10 @@ static result_t lisp_bool_and(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_bool_not(object_t *func, object_t *args, env_t *env,
-                              bool *dirty) {
+                              int *recursion_depth, bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 1);
-    args_eval_all(list, env, dirty);
+    args_eval_all(list, env, recursion_depth, dirty);
 
     object_t *result = obj_is_null(list.array[0]) ? T : NIL;
     list_end(list);

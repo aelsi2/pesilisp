@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define RECURSION_LIMIT 1000
+
 static const char *start_message =
     "Welcome to PesiLISP!\n"
     "Type (help) to list the standard functions or (quit) to leave.\n\n";
@@ -53,8 +55,9 @@ static int run_repl(parser_t *parser, env_t *env) {
             continue;
         }
 
-        bool dirty;
-        result_t eval_result = obj_eval(parse_result.object, env, &dirty);
+        bool dirty = false;
+        int recursion_depth = RECURSION_LIMIT;
+        result_t eval_result = obj_eval(parse_result.object, env, &recursion_depth, &dirty);
         obj_unref(parse_result.object);
         if (!result_is_error(&eval_result)) {
             begin_color(stdout, COLOR_BLUE);
@@ -101,8 +104,9 @@ static int run_normal(parser_t *parser, env_t *env) {
             break;
         }
 
-        bool dirty;
-        result_t eval_result = obj_eval(parse_result.object, env, &dirty);
+        bool dirty = false;
+        int recursion_depth = RECURSION_LIMIT;
+        result_t eval_result = obj_eval(parse_result.object, env, &recursion_depth, &dirty);
         obj_unref(parse_result.object);
 
         if (result_is_error(&eval_result)) {

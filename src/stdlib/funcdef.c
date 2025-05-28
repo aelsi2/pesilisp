@@ -15,7 +15,7 @@ static const char *error_format_lambda_bad_arg_spec =
     "The first argument in a LAMBDA form must be a list of symbols.";
 
 static result_t lisp_defun(object_t *func, object_t *args, env_t *env,
-                           bool *dirty) {
+                           int *recursion_depth, bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 3);
 
@@ -59,7 +59,7 @@ static result_t lisp_defun(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_lambda(object_t *func, object_t *args, env_t *env,
-                            bool *dirty) {
+                            int *recursion_depth, bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 2);
 

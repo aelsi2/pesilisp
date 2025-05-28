@@ -51,7 +51,7 @@ bool type_subtype_of(const obj_type_t* type, const obj_type_t* super);
 const char *type_get_name(const obj_type_t* type);
 
 // Evaluates the LISP object and returns a new object or an error.
-result_t obj_eval(object_t *object, env_t *env, bool *dirty);
+result_t obj_eval(object_t *object, env_t *env, int *recursion_depth, bool *dirty);
 
 // Prints the LISP object to the file.
 void obj_print(const object_t *object, FILE *file);
