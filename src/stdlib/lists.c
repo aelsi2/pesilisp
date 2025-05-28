@@ -1,7 +1,6 @@
 #include "data/cons.h"
 #include "func_utils.h"
 #include "modules.h"
-#include "utils.h"
 
 static result_t lisp_cons(object_t *func, object_t *args, env_t *env,
                           bool *dirty) {
