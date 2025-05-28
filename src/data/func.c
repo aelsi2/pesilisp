@@ -10,7 +10,7 @@
 #include <string.h>
 
 static const char *error_format_recursion_limit =
-    "Recursion limit reached while trying to evaluate function '%s'.";
+    "Recursion limit exceeded in function %s.";
 
 typedef struct {
     object_t base;
@@ -110,6 +110,12 @@ static bool should_cache_result(object_t *result) {
 static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
                                int *recursion_limit, bool *dirty) {
     lisp_func_t *func = (lisp_func_t *)object;
+    
+    if (*recursion_limit <= 0) {
+        error_t *error =
+            error_runtime(NULL, error_format_recursion_limit, func->base.name);
+        return result_error(error);
+    }
 
     list_begin(list, args);
     ensure_args_exactly(func, list, func->arg_count);
@@ -131,13 +137,6 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
     }
 
     bool result_dirty = false;
-    if (*recursion_limit <= 0) {
-        list_end(list);
-        env_free(exec_env);
-        error_t *error =
-            error_runtime(NULL, error_format_recursion_limit, func->base.name);
-        return result_error(error);
-    }
     (*recursion_limit)--;
     result_t result =
         obj_eval(func->value, exec_env, recursion_limit, &result_dirty);
