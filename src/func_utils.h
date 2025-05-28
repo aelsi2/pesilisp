@@ -11,17 +11,17 @@
 
 #define list_end(list) obj_list_free(&list)
 
-#define args_eval_all(list, env, recursion_depth, dirty)                       \
+#define args_eval_all(list, env, recursion_limit, dirty)                       \
     do {                                                                       \
         for (int i = 0; i < list.count; i++) {                                 \
-            arg_eval(list, i, env, recursion_depth, dirty);                    \
+            arg_eval(list, i, env, recursion_limit, dirty);                    \
         }                                                                      \
     } while (0)
 
-#define arg_eval(list, index, env, recursion_depth, dirty)                     \
+#define arg_eval(list, index, env, recursion_limit, dirty)                     \
     do {                                                                       \
         result_t arg_eval_res =                                                \
-            obj_eval(list.array[index], env, recursion_depth, dirty);          \
+            obj_eval(list.array[index], env, recursion_limit, dirty);          \
         if (result_is_error(&arg_eval_res)) {                                  \
             obj_list_free(&list);                                              \
             return arg_eval_res;                                               \

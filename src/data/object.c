@@ -28,8 +28,8 @@ const char *type_get_name(const obj_type_t *type) {
     return type->name;
 }
 
-result_t obj_eval(object_t *object, env_t *env, int *recursion_depth, bool *dirty) {
-    return object->type->eval(object, env, recursion_depth, dirty);
+result_t obj_eval(object_t *object, env_t *env, int *recursion_limit, bool *dirty) {
+    return object->type->eval(object, env, recursion_limit, dirty);
 }
 
 void obj_print(const object_t *object, FILE *file) {

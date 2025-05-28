@@ -25,7 +25,7 @@ const char *help_message = "\n"
                            "\n";
 
 static result_t lisp_help(object_t *func, object_t *args, env_t *env,
-                          int *recursion_depth, bool *dirty) {
+                          int *recursion_limit, bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 0);
     list_end(list);

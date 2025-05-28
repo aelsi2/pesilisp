@@ -17,11 +17,11 @@ typedef struct {
     object_t *cdr;
 } cons_t;
 
-static result_t cons_eval(object_t *obj, env_t *env, int *recursion_depth, bool *dirty) {
+static result_t cons_eval(object_t *obj, env_t *env, int *recursion_limit, bool *dirty) {
     cons_t *cons = (cons_t *)obj;
     object_t *args = cons->cdr;
 
-    result_t func_res = obj_eval(cons->car, env, recursion_depth, dirty);
+    result_t func_res = obj_eval(cons->car, env, recursion_limit, dirty);
     if (result_is_error(&func_res)) {
         return func_res;
     }
@@ -32,7 +32,7 @@ static result_t cons_eval(object_t *obj, env_t *env, int *recursion_depth, bool 
         return result_error(error);
     }
 
-    result_t result = obj_call_func(func_res.object, cons->cdr, env, recursion_depth, dirty);
+    result_t result = obj_call_func(func_res.object, cons->cdr, env, recursion_limit, dirty);
     obj_unref(func_res.object);
 
     return result;
