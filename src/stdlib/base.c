@@ -1,6 +1,6 @@
+#include "data/symbol.h"
 #include "func_utils.h"
 #include "modules.h"
-#include "symbol.h"
 
 static const char *error_format_let_not_list =
     "The first parameter of a LET form must be a list of definitions.\n"
@@ -79,7 +79,7 @@ static result_t lisp_let(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_let_star(object_t *func, object_t *args, env_t *env,
-                         bool *dirty) {
+                              bool *dirty) {
     list_begin(list, args);
     ensure_args_at_least(func, list, 1);
     env_t *child_env = env_new(env);
@@ -132,7 +132,7 @@ static result_t lisp_quote(object_t *func, object_t *args, env_t *env,
 }
 
 static result_t lisp_eval(object_t *func, object_t *args, env_t *env,
-                           bool *dirty) {
+                          bool *dirty) {
     list_begin(list, args);
     ensure_args_exactly(func, list, 1);
     arg_eval(list, 0, env, dirty);

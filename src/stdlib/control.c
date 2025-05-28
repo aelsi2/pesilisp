@@ -1,4 +1,4 @@
-#include "environment.h"
+#include "data/environment.h"
 #include "func_utils.h"
 #include "modules.h"
 
@@ -11,7 +11,7 @@ static result_t read_cond_clause(object_t *clause, env_t *env, bool *dirty,
         return result_error(error_usage(NULL, error_format_bad_cond_clause));
     }
     list_begin(list, clause);
-    
+
     if (list.count == 1) {
         result_t result = obj_eval(list.array[0], env, dirty);
         list_end(list);

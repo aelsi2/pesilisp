@@ -5,7 +5,7 @@ TARGET_EXEC := $(BUILD_DIR)/pesilisp
 SRCS := $(shell find $(SRC_DIRS) -name '*.c')
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:%.o=%.d)
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_DIRS := $(SRC_DIRS)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CFLAGS := $(INC_FLAGS) -MMD -MP -g
 LDFLAGS := -fsanitize=leak -fsanitize=address
