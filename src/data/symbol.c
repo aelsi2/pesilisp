@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *error_format_undef_var = "Undefined variable: '%s'.";
+static const char *error_format_undef_var = "Undefined variable: %s.";
 
 static error_t *error_undef_var(const char *name) {
-    return error_runtime(NULL, error_format_undef_var, name);
+    return error_usage(NULL, error_format_undef_var, name);
 }
 
 typedef struct {
