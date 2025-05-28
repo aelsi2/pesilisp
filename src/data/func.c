@@ -10,7 +10,7 @@
 #include <string.h>
 
 static const char *error_format_recursion_limit =
-    "Recursion limit exceeded in function %s.";
+    "Recursion limit exceeded in function %s";
 
 typedef struct {
     object_t base;

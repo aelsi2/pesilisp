@@ -15,10 +15,10 @@
 static const char *error_format_unex_eof =
     "Unexpected EOF. Did you forget a ')'?";
 
-static const char *error_format_unex_char = "Unexpected character: '%c'.";
+static const char *error_format_unex_char = "Unexpected character: '%c'";
 
 static const char *error_format_no_dot_list_end =
-    "Dotted list not terminated with a ')'.";
+    "Dotted list not terminated with a ')'";
 
 static const char *error_format_bad_char_range =
     "One or more invalid chatacters encountered.";

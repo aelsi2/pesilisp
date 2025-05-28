@@ -3,52 +3,52 @@
 #include <limits.h>
 
 static const char *error_format_few_args_exact =
-    "Not enough arguments provided to function %s.\n"
-    "Got: %d. Expected: %d.";
+    "Too few arguments provided to function %s\n"
+    "Expected: %d    Got: %d";
 
 static const char *error_format_many_args_exact =
-    "Too many arguments provided to function %s.\n"
-    "Got: %d. Expected: %d.";
+    "Too many arguments provided to function %s\n"
+    "Expected: %d    Got: %d";
 
 static const char *error_format_few_args_min =
-    "Not enough arguments provided to function %s.\n"
-    "Got: %d. Expected: %d or more.";
+    "Too few arguments provided to function %s\n"
+    "Expected: %d or more    Got: %d";
 
 static const char *error_format_few_args_range =
-    "Not enough arguments provided to function %s.\n"
-    "Got: %d. Expected: between %d and %d.";
+    "Too few arguments provided to function %s\n"
+    "Expected: between %d and %d    Got: %d";
 
 static const char *error_format_many_args_range =
-    "Too many arguments provided to function %s.\n"
-    "Got: %d. Expected: between %d and %d.";
+    "Too many arguments provided to function %s\n"
+    "Expected: between %d and %d    Got: %d";
 
 static const char *error_format_wrong_type =
     "Argument %d provided to function %s does not have the right type.\n"
-    "Got: %s. Expected: %s.";
+    "Expected: %s    Got: %s";
 
 static const char *error_format_not_list =
     "Argument %d provided to function %s does not have the right type.\n"
-    "Got: %s. Expected: LIST (CONS or NULL).";
+    "Expected: LIST (CONS or NULL)    Got: %s";
 
 error_t *error_wrong_arg_count(const char *name, int min, int max, int actual) {
     if (max == INT_MAX) {
-        return error_usage(NULL, error_format_few_args_min, name, actual, min);
+        return error_usage(NULL, error_format_few_args_min, name, min, actual);
     }
     if (min == max) {
         if (actual < min) {
-            return error_usage(NULL, error_format_few_args_exact, name, actual,
-                               min);
+            return error_usage(NULL, error_format_few_args_exact, name, min,
+                               actual);
         } else {
-            return error_usage(NULL, error_format_many_args_exact, name, actual,
-                               min);
+            return error_usage(NULL, error_format_many_args_exact, name, min,
+                               actual);
         }
     } else {
         if (actual < min) {
-            return error_usage(NULL, error_format_few_args_range, name, actual,
-                               min, max);
+            return error_usage(NULL, error_format_few_args_range, name, min,
+                               max, actual);
         } else {
-            return error_usage(NULL, error_format_many_args_range, name, actual,
-                               min, max);
+            return error_usage(NULL, error_format_many_args_range, name, min,
+                               max, actual);
         }
     }
 }
@@ -58,12 +58,12 @@ error_t *error_wrong_arg_type(const char *func_name, int arg_index,
                               const obj_type_t *actual) {
 
     return error_usage(NULL, error_format_wrong_type, arg_index + 1, func_name,
-                       type_get_name(actual), type_get_name(expected));
+                       type_get_name(expected), type_get_name(actual));
 }
 
 error_t *error_arg_not_list(const char *func_name, int arg_index,
                             const obj_type_t *actual) {
-    
+
     return error_usage(NULL, error_format_not_list, arg_index + 1, func_name,
                        type_get_name(actual));
 }
