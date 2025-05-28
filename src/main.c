@@ -51,6 +51,7 @@ static int run_repl(parser_t *parser, env_t *env) {
             begin_color(stdout, COLOR_RED);
             error_print(error, stdout);
             end_color(stdout);
+            fputc('\n', stdout);
             error_free(error);
             continue;
         }
@@ -77,6 +78,7 @@ static int run_repl(parser_t *parser, env_t *env) {
             begin_color(stdout, COLOR_RED);
             error_print(error, stdout);
             end_color(stdout);
+            fputc('\n', stdout);
             error_free(error);
         }
     }
@@ -99,6 +101,7 @@ static int run_normal(parser_t *parser, env_t *env) {
             begin_color(stderr, COLOR_RED);
             error_print(error, stderr);
             end_color(stderr);
+            fputc('\n', stderr);
             error_free(error);
             result = 1;
             break;
@@ -118,6 +121,7 @@ static int run_normal(parser_t *parser, env_t *env) {
                 begin_color(stderr, COLOR_RED);
                 error_print(error, stderr);
                 end_color(stderr);
+                fputc('\n', stderr);
             }
             error_free(error);
             break;

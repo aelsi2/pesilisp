@@ -103,8 +103,8 @@ void error_print(error_t *error, FILE *file) {
                 column);
     }
     if (error->message) {
-        fprintf(file, ": \n%s\n", error->message);
+        fprintf(file, ": \n%s", error->message);
     } else {
-        fprintf(file, ".\n");
+        fprintf(file, ".");
     }
 }
