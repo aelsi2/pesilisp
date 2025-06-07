@@ -13,10 +13,11 @@ static const char *start_message =
     "Welcome to PesiLISP!\n"
     "Type (help) to list the standard functions or (quit) to leave.\n\n";
 static const char *exit_message = "Bye.\n";
+static const char *default_name = "pesilisp";
 static const char *help_message =
     "PesiLISP - A perfectly simple LISP interpreter.\n"
     "\n"
-    "Usage: pesilisp [-h | --help | lispfile]\n"
+    "Usage: %s [-h | --help | lispfile]\n"
     "Options:\n"
     "-h --help : print this message\n"
     "Arguments:\n"
@@ -58,7 +59,8 @@ static int run_repl(parser_t *parser, env_t *env) {
 
         bool dirty = false;
         int recursion_limit = RECURSION_LIMIT;
-        result_t eval_result = obj_eval(parse_result.object, env, recursion_limit, &dirty);
+        result_t eval_result =
+            obj_eval(parse_result.object, env, recursion_limit, &dirty);
         obj_unref(parse_result.object);
         if (!result_is_error(&eval_result)) {
             begin_color(stdout, COLOR_BLUE);
@@ -109,7 +111,8 @@ static int run_normal(parser_t *parser, env_t *env) {
 
         bool dirty = false;
         int recursion_limit = RECURSION_LIMIT;
-        result_t eval_result = obj_eval(parse_result.object, env, recursion_limit, &dirty);
+        result_t eval_result =
+            obj_eval(parse_result.object, env, recursion_limit, &dirty);
         obj_unref(parse_result.object);
 
         if (result_is_error(&eval_result)) {
@@ -169,7 +172,9 @@ int main(int argc, char **argv) {
             result = 1;
         }
     } else {
-        fprintf(stdout, "%s", help_message);
+        bool has_name = argc > 0 && argv[0][0];
+        const char *name = has_name ? argv[0] : default_name;
+        fprintf(stdout, help_message, name);
     }
 
     return result;
