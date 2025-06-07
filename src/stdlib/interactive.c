@@ -2,7 +2,7 @@
 #include "func_utils.h"
 #include "modules.h"
 
-const char *help_message = "\n"
+static const char *help_message = "\n"
                            "Common:\n"
                            "  QUOTE, LET, LET*,\n"
                            "  EVAL, APPLY, NULL, EQ\n"

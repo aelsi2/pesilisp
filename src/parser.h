@@ -5,7 +5,7 @@
 
 typedef struct parser_s parser_t;
 
-parser_t *parser_default();
+parser_t *parser_default(void);
 
 parser_t *parser_new(FILE *file, const char *file_name);
 

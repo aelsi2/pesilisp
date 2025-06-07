@@ -4,7 +4,7 @@
 
 static const char *error_format_divide_by_zero = "Division by zero.";
 
-static error_t *error_divide_by_zero() {
+static error_t *error_divide_by_zero(void) {
     return error_runtime(NULL, error_format_divide_by_zero);
 }
 

@@ -21,7 +21,7 @@ static const char *error_format_no_dot_list_end =
     "Dotted list not terminated with a ')'";
 
 static const char *error_format_bad_char_range =
-    "One or more invalid chatacters encountered.";
+    "One or more invalid characters encountered.";
 
 static const char *error_format_invalid_dot = "Dot ('.') is not allowed here.";
 
@@ -34,15 +34,12 @@ struct parser_s {
 static parser_t default_parser;
 static bool default_parser_init = false;
 
-parser_t *parser_default() {
+parser_t *parser_default(void) {
     if (!default_parser_init) {
-        default_parser = (parser_t) {
+        default_parser = (parser_t){
             .file = stdin,
-            .location = (location_t) {
-                .file_name = "stdin",
-                .line = 1,
-                .column = 1
-            },
+            .location =
+                (location_t){.file_name = "stdin", .line = 1, .column = 1},
             .current_value = CHAR_UNINIT,
         };
         default_parser_init = true;
@@ -96,7 +93,7 @@ static int parser_consume(parser_t *parser) {
     return value;
 }
 
-static bool isatom(int ch) {
+static bool is_atom(int ch) {
     if (!isgraph(ch)) {
         return false;
     }
@@ -109,23 +106,11 @@ static bool isatom(int ch) {
     return true;
 }
 
-static bool isstart(int ch) {
-    if (isatom(ch)) {
-        return true;
-    }
-    switch (ch) {
-    case '(':
-    case '\'':
-        return true;
-    }
-    return false;
-}
-
-static bool isbad(int ch) {
+static bool is_bad(int ch) {
     return !isspace(ch) && !isgraph(ch) && ch != CHAR_EOF;
 }
 
-static void parser_move_to_next(parser_t *parser) {
+static void parser_move_next(parser_t *parser) {
     while (true) {
         int ch = parser_peek(parser);
         if (ch == ';') {
@@ -144,7 +129,7 @@ static void parser_move_to_next(parser_t *parser) {
     }
 }
 
-static error_t *error_dot_list_end(const location_t *location) {
+static error_t *error_unterminated_dot_list(const location_t *location) {
     return error_syntax(location, error_format_no_dot_list_end);
 }
 
@@ -156,7 +141,7 @@ static error_t *error_invalid_dot(const location_t *location) {
     return error_syntax(location, error_format_invalid_dot);
 }
 
-static error_t *error_unexpected(const location_t *location, int ch) {
+static error_t *error_unexpected_char(const location_t *location, int ch) {
     error_t *error;
     if (ch == CHAR_EOF) {
         error = error_syntax(location, error_format_unex_eof);
@@ -194,7 +179,7 @@ static result_t parser_parse_atom(parser_t *parser) {
     size_t capacity = 16;
     size_t count = 0;
     char *name = malloc(capacity);
-    while (isatom(parser_peek(parser))) {
+    while (is_atom(parser_peek(parser))) {
         name[count++] = toupper(parser_consume(parser));
         if (count == capacity - 1) {
             capacity *= 2;
@@ -233,11 +218,11 @@ static result_t parser_parse_list_tail(parser_t *parser) {
         car = car_res.object;
     }
 
-    parser_move_to_next(parser);
+    parser_move_next(parser);
     int ch = parser_peek(parser);
     if (ch == '.') {
         parser_consume(parser);
-        parser_move_to_next(parser);
+        parser_move_next(parser);
 
         result_t cdr_res = parser_parse_object(parser);
         if (result_is_error(&cdr_res)) {
@@ -250,12 +235,12 @@ static result_t parser_parse_list_tail(parser_t *parser) {
             cdr = cdr_res.object;
         }
 
-        parser_move_to_next(parser);
+        parser_move_next(parser);
         if (parser_peek(parser) == ')') {
             parser_consume(parser);
         } else {
             if (error == NULL) {
-                error = error_dot_list_end(&parser->location);
+                error = error_unterminated_dot_list(&parser->location);
             }
         }
     } else if (ch == ')') {
@@ -263,7 +248,7 @@ static result_t parser_parse_list_tail(parser_t *parser) {
         cdr = NIL;
     } else if (ch == CHAR_EOF) {
         if (error == NULL) {
-            error = error_unexpected(&parser->location, ch);
+            error = error_unexpected_char(&parser->location, ch);
         }
     } else {
         result_t cdr_res = parser_parse_list_tail(parser);
@@ -291,7 +276,7 @@ static result_t parser_parse_list_tail(parser_t *parser) {
 
 static result_t parser_parse_list(parser_t *parser) {
     parser_consume(parser);
-    parser_move_to_next(parser);
+    parser_move_next(parser);
     int ch = parser_peek(parser);
     if (ch == ')') {
         parser_consume(parser);
@@ -302,7 +287,7 @@ static result_t parser_parse_list(parser_t *parser) {
 
 static result_t parser_parse_quote(parser_t *parser) {
     parser_consume(parser);
-    parser_move_to_next(parser);
+    parser_move_next(parser);
     result_t result = parser_parse_object(parser);
     if (result_is_error(&result)) {
         return result;
@@ -319,7 +304,7 @@ static result_t parser_parse_quote(parser_t *parser) {
 static result_t parser_parse_bad(parser_t *parser) {
     location_t start;
     location_copy_temp(&start, &parser->location);
-    while (isbad(parser_peek(parser))) {
+    while (is_bad(parser_peek(parser))) {
         parser_consume(parser);
     }
     return result_error(error_bad_char_range(&start));
@@ -335,19 +320,19 @@ static result_t parser_parse_object(parser_t *parser) {
         return parser_parse_list(parser);
     } else if (ch == '\'') {
         return parser_parse_quote(parser);
-    } else if (isatom(ch)) {
+    } else if (is_atom(ch)) {
         return parser_parse_atom(parser);
-    } else if (isbad(ch)) {
+    } else if (is_bad(ch)) {
         return parser_parse_bad(parser);
     } else {
-        error_t *error = error_unexpected(&parser->location, ch);
+        error_t *error = error_unexpected_char(&parser->location, ch);
         parser_consume(parser);
         return result_error(error);
     }
 }
 
 bool parser_read_object(parser_t *parser, result_t *result) {
-    parser_move_to_next(parser);
+    parser_move_next(parser);
     if (parser_peek(parser) == CHAR_EOF) {
         return false;
     }

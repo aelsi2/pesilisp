@@ -21,8 +21,8 @@ void env_define(env_t *env, const char *name, object_t *value);
 // Returns NIL if the variable is undefined.
 object_t *env_get(const env_t *env, const char *name);
 
-// Captures the environment creating a copy.
-env_t *env_capture(const env_t *env);
+// Makes a full copy of the environment.
+env_t *env_copy(const env_t *env);
 
 // Frees the environment.
 void env_free(env_t *env);

@@ -2,7 +2,7 @@
 #include "cons.h"
 #include <stdlib.h>
 
-obj_list_t obj_flatten(object_t *obj) {
+obj_list_t obj_list_flatten(object_t *obj) {
     obj_list_t list;
     size_t capacity = 16;
     list.count = 0;

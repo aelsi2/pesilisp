@@ -7,7 +7,7 @@
 
 static const char *error_format_undef_var = "Undefined variable: %s";
 
-static error_t *error_undef_var(const char *name) {
+static error_t *error_undefined_var(const char *name) {
     return error_usage(NULL, error_format_undef_var, name);
 }
 
@@ -16,10 +16,11 @@ typedef struct {
     char *name;
 } symbol_t;
 
-static result_t symbol_eval(object_t *obj, env_t *env, int recursion_limit, bool *dirty) {
+static result_t symbol_eval(object_t *obj, env_t *env, int recursion_limit,
+                            bool *dirty) {
     symbol_t *sym = (symbol_t *)obj;
     if (!env_is_defined(env, sym->name)) {
-        return result_error(error_undef_var(sym->name));
+        return result_error(error_undefined_var(sym->name));
     }
     return result_success(env_get(env, sym->name));
 }

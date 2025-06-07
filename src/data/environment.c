@@ -30,12 +30,8 @@ env_t *env_new(env_t *parent) {
     return env;
 }
 
-static size_t env_get_index(const env_t *env, const char *name) {
-    return hash_str(name) % env->capacity;
-}
-
 static kvp_t *env_find_cell(const env_t *env, const char *name) {
-    size_t initial_index = env_get_index(env, name);
+    size_t initial_index = hash_str(name) % env->capacity;
     size_t index = initial_index;
     while (true) {
         kvp_t *kvp = &env->cells[index];
@@ -111,7 +107,7 @@ object_t *env_get(const env_t *env, const char *name) {
     }
 }
 
-void env_add_all(env_t *dest, const env_t *src) {
+static void env_add_all(env_t *dest, const env_t *src) {
     if (src->parent != NULL) {
         env_add_all(dest, src->parent);
     }
@@ -124,10 +120,10 @@ void env_add_all(env_t *dest, const env_t *src) {
     }
 }
 
-env_t *env_capture(const env_t *env) {
-    env_t *capture = env_new(NULL);
-    env_add_all(capture, env);
-    return capture;
+env_t *env_copy(const env_t *env) {
+    env_t *copy = env_new(NULL);
+    env_add_all(copy, env);
+    return copy;
 }
 
 void env_free(env_t *env) {

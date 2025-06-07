@@ -131,7 +131,7 @@ static int run_normal(parser_t *parser, env_t *env) {
     return result;
 }
 
-env_t *make_env(void) {
+static env_t *make_env(void) {
     env_t *env = env_new(NULL);
     env_load_base(env);
     env_load_control(env);

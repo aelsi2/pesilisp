@@ -7,7 +7,7 @@
 #include "data/primitives.h"
 #include <limits.h>
 
-#define list_begin(list, args) obj_list_t list = obj_flatten(args)
+#define list_begin(list, args) obj_list_t list = obj_list_flatten(args)
 
 #define list_end(list) obj_list_free(&list)
 
@@ -99,7 +99,7 @@
 
 #define env_register_func(env, name, func)                                     \
     do {                                                                       \
-        object_t *func_obj = obj_make_native_func(name, func);                 \
+        object_t *func_obj = obj_make_func(name, func);                 \
         env_define(env, name, func_obj);                                       \
         obj_unref(func_obj);                                                   \
     } while (0)

@@ -18,7 +18,6 @@ typedef struct {
 } error_t;
 
 error_t *error_exit(int code);
-error_t *error_interactive();
 error_t *error_syntax(const location_t *loc, const char *message, ...);
 error_t *error_usage(const location_t *loc, const char *message, ...);
 error_t *error_runtime(const location_t *loc, const char *message, ...);

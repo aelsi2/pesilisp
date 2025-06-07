@@ -18,13 +18,13 @@ typedef struct {
     lisp_callback_t *callback;
 } func_t;
 
-void func_free(object_t *obj) {
+static void func_free(object_t *obj) {
     func_t *func = (func_t *)obj;
     free(func->name);
     obj_free_default(obj);
 }
 
-void func_print(const object_t *obj, FILE *file) {
+static void func_print(const object_t *obj, FILE *file) {
     func_t *func = (func_t *)obj;
     fprintf(file, "#<FUNCTION %s>", func->name);
 }
@@ -83,7 +83,7 @@ const char *obj_func_name(object_t *object) {
 
 static const char *func_name_default = "(anonymous)";
 
-object_t *obj_make_native_func(const char *name, lisp_callback_t *callback) {
+object_t *obj_make_func(const char *name, lisp_callback_t *callback) {
     func_t *func = obj_alloc_default(&TYPE_FUNC, false);
     func->callback = callback;
     if (!name) {
@@ -142,7 +142,7 @@ static result_t lisp_func_call(object_t *object, object_t *args, env_t *env,
     bool result_cache = !result_dirty && !result_is_error(&result) &&
                         should_cache_result(result.object);
     if (args_cache && result_cache) {
-        cache_remember(func->cache, &list, result.object);
+        cache_store(func->cache, &list, result.object);
     }
     if (result_dirty) {
         *dirty = true;
@@ -161,7 +161,7 @@ object_t *obj_make_lisp_func(const char *name, int arg_count, const char **args,
     }
     func->base.name = malloc(strlen(name) + 1);
     strcpy(func->base.name, name);
-    func->captured_env = env_capture(environment);
+    func->captured_env = env_copy(environment);
     func->value = obj_ref(value);
     func->base.callback = lisp_func_call;
     func->cache = cache_new();

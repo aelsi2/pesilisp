@@ -16,8 +16,7 @@ struct cache_s {
     size_t count;
 };
 
-
-cache_t *cache_new() {
+cache_t *cache_new(void) {
     cache_t *cache = malloc(sizeof(cache_t));
     cache->count = 0;
     cache->capacity = INITIAL_CAPACITY;
@@ -36,7 +35,6 @@ void cache_free(cache_t *cache) {
     free(cache->cells);
     free(cache);
 }
-
 
 static size_t cache_get_index(const cache_t *cache, obj_list_t *args) {
     hash_t hash = hash_default;
@@ -108,7 +106,7 @@ static void cache_grow(cache_t *cache) {
     free(old_cells);
 }
 
-void cache_remember(cache_t *cache, obj_list_t *args, object_t *value) {
+void cache_store(cache_t *cache, obj_list_t *args, object_t *value) {
     kvp_t *cell = cache_find_cell(cache, args);
     if (cell->value) {
         obj_unref(cell->value);
