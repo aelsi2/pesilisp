@@ -143,6 +143,7 @@ static env_t *make_env(void) {
     env_load_boolean(env);
     env_load_lists(env);
     env_load_io(env);
+    env_load_gui(env);
     env_load_interactive(env);
     return env;
 }
