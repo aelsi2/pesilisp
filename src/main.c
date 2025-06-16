@@ -4,7 +4,6 @@
 #include "stdlib/modules.h"
 #include "tty.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define RECURSION_LIMIT 1000

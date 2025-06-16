@@ -7,20 +7,20 @@
 #include "tty.h"
 #include <stdbool.h>
 
-#ifdef TTY_UNIX
+#if defined(TTY_UNIX)
 #include <unistd.h>
-#elifdef TTY_WINDOWS
+#elif defined(TTY_WINDOWS)
 #include <windows.h>
 #endif
 
 #define ANSI_COLOR "\x1b[%dm"
 
 void begin_color(FILE *file, int color) {
-#ifdef TTY_UNIX
+#if defined(TTY_UNIX)
     if (isatty(fileno(file))) {
         fprintf(file, ANSI_COLOR, color);
     }
-#elifdef TTY_WINDOWS
+#elif defined(TTY_WINDOWS)
     WORD attributes;
     switch (color) {
         case COLOR_RED:
@@ -43,11 +43,11 @@ void begin_color(FILE *file, int color) {
 
 
 void end_color(FILE *file) {
-#ifdef TTY_UNIX
+#if defined(TTY_UNIX)
     if (isatty(fileno(file))) {
         fprintf(file, ANSI_COLOR, 0);
     }
-#elifdef TTY_WINDOWS
+#elif defined(TTY_WINDOWS)
     WORD attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
     HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD mode;
