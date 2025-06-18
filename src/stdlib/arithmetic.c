@@ -151,6 +151,29 @@ static result_t lisp_int_eq(object_t *func, object_t *args, env_t *env,
     return result_success(result ? T : NIL);
 }
 
+static result_t lisp_int_neq(object_t *func, object_t *args, env_t *env,
+                            int recursion_limit, bool *dirty) {
+    list_begin(list, args);
+    args_eval_all(list, env, recursion_limit, dirty);
+    ensure_args_at_least(func, list, 1);
+
+    bool result = true;
+    for (int i = 0; i < list.count; i++) {
+        ensure_type(func, list, i, &TYPE_INT);
+        intval_t value = obj_get_int(list.array[i]);
+        for (int j = 0; j < i; j++) {
+            intval_t other = obj_get_int(list.array[j]);
+            if (value == other) {
+                result = false;
+                break;
+            }
+        }
+    }
+    list_end(list);
+
+    return result_success(result ? T : NIL);
+}
+
 static result_t lisp_int_lt(object_t *func, object_t *args, env_t *env,
                             int recursion_limit, bool *dirty) {
     list_begin(list, args);
@@ -251,6 +274,7 @@ void env_load_arithmetic(env_t *env) {
     env_register_func(env, "MOD", lisp_int_mod);
     env_register_func(env, "REM", lisp_int_rem);
     env_register_func(env, "=", lisp_int_eq);
+    env_register_func(env, "/=", lisp_int_neq);
     env_register_func(env, "<", lisp_int_lt);
     env_register_func(env, ">", lisp_int_gt);
     env_register_func(env, "<=", lisp_int_le);
